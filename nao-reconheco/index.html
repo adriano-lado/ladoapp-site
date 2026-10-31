@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lado · Não reconheço este cadastro</title>
+<meta name="description" content="Tire do ar um cadastro feito sem autorização.">
+<meta name="theme-color" content="#1B2228">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../estilo.css">
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="../" aria-label="Lado, página inicial"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><clipPath id="pl"><rect width="50" height="100"/></clipPath><clipPath id="pr"><rect x="50" width="50" height="100"/></clipPath></defs><path clip-path="url(#pl)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#E2483D"/><path clip-path="url(#pr)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#2F66D8"/><circle cx="50" cy="37" r="12" fill="#fff"/></svg><span>lado</span></a>
+  <nav aria-label="Menu"><a href="../#como-funciona">Como funciona</a><a href="../#empresas">Para empresas</a><a href="../suporte/">Suporte</a></nav>
+</header>
+<main>
+
+<article class="doc">
+<h1>Não reconhece este cadastro?</h1>
+<p>Se alguém cadastrou a sua empresa no Lado sem autorização, toque no botão abaixo. O perfil sai do ar na hora e a nossa equipe analisa em até 24 horas.</p>
+<div class="cartao" style="display:grid;gap:12px;margin-top:16px">
+  <button class="botao vermelho" id="btn">Tirar o perfil do ar agora</button>
+  <p id="msg" role="status" style="margin:0"></p>
+</div>
+<p class="meta" style="margin-top:16px">Dúvidas: <a href="../suporte/">suporte</a> · contato@ladoapp.com.br</p>
+</article>
+<script>
+  // Chave pública (publishable) do Supabase: pode ficar no site; quem protege os dados são as regras do banco.
+  const SUPABASE_URL = 'https://oxhedfbrgdaxbwkjtwiz.supabase.co';
+  const SUPABASE_CHAVE = 'sb_publishable_3HAUdFwaNBw8sEsGrVPtkw_OdzNtd15';
+  const token = new URLSearchParams(location.search).get('t');
+  const btn = document.getElementById('btn'), msg = document.getElementById('msg');
+  if (!token) { btn.disabled = true; msg.textContent = 'Link incompleto. Use o link exatamente como chegou no e-mail ou SMS.'; }
+  btn.addEventListener('click', async () => {
+    btn.disabled = true; msg.textContent = 'Enviando...';
+    try {
+      const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/nao_reconheco', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: SUPABASE_CHAVE },
+        body: JSON.stringify({ p_token: token })
+      });
+      const res = await r.json();
+      if (res === 'perfil_suspenso') { msg.innerHTML = '<span class="ok">Pronto. O perfil saiu do ar.</span> Nossa equipe vai entrar em contato.'; }
+      else { msg.textContent = 'Este link já foi usado ou não é válido. Se precisar, fale com o suporte.'; }
+    } catch (e) { btn.disabled = false; msg.textContent = 'Sem conexão. Tente de novo.'; }
+  });
+</script>
+
+</main>
+<footer class="rodape"><div class="in">
+  <span>© 2026 Lado · Dois lados, um mapa.</span>
+  <span><a href="../termos/">Termos de uso</a> · <a href="../privacidade/">Privacidade</a> · <a href="../suporte/">Suporte</a> · <a href="mailto:contato@ladoapp.com.br">contato@ladoapp.com.br</a></span>
+</div></footer>
+</body>
+</html>
