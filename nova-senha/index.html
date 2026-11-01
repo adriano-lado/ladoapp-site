@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lado · Criar nova senha</title>
+<meta name="description" content="Crie uma nova senha para a sua conta de empresa no Lado.">
+<meta name="theme-color" content="#1B2228">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../estilo.css">
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="../" aria-label="Lado, página inicial"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><clipPath id="pl"><rect width="50" height="100"/></clipPath><clipPath id="pr"><rect x="50" width="50" height="100"/></clipPath></defs><path clip-path="url(#pl)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#E2483D"/><path clip-path="url(#pr)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#2F66D8"/><circle cx="50" cy="37" r="12" fill="#fff"/></svg><span>lado</span></a>
+  <nav aria-label="Menu"><a href="../como-usar/">Como usar</a><a href="../#como-funciona">Como funciona</a><a href="../#empresas">Para empresas</a><a href="../suporte/">Suporte</a></nav>
+</header>
+<main>
+
+<article class="doc" style="max-width:520px">
+<h1>Criar nova senha</h1>
+<p>Escolha a nova senha da sua conta de empresa no Lado.</p>
+<form id="form" class="cartao" style="display:grid;gap:12px;margin-top:16px" autocomplete="off">
+  <label style="display:grid;gap:6px;font-weight:600">Nova senha
+    <input id="s1" type="password" autocomplete="new-password" minlength="8" required style="font:inherit;padding:12px;border-radius:10px;border:1.5px solid var(--borda)">
+  </label>
+  <label style="display:grid;gap:6px;font-weight:600">Repita a nova senha
+    <input id="s2" type="password" autocomplete="new-password" minlength="8" required style="font:inherit;padding:12px;border-radius:10px;border:1.5px solid var(--borda)">
+  </label>
+  <label style="display:flex;gap:8px;align-items:center;font-size:14px"><input id="ver" type="checkbox"> Mostrar senha</label>
+  <p class="meta" style="margin:0">Use 8 ou mais caracteres, com letras e números.</p>
+  <button class="botao" id="btn" type="submit">Salvar nova senha</button>
+  <p id="msg" role="status" style="margin:0"></p>
+</form>
+<p class="meta" style="margin-top:16px">Problemas? <a href="../suporte/">Suporte</a> · contato@ladoapp.com.br</p>
+</article>
+<script>
+  // O link do e-mail traz um acesso temporário (só para trocar a senha). Nada é guardado neste site.
+  const SUPABASE_URL = 'https://oxhedfbrgdaxbwkjtwiz.supabase.co';
+  const SUPABASE_CHAVE = 'sb_publishable_3HAUdFwaNBw8sEsGrVPtkw_OdzNtd15';
+  const h = new URLSearchParams(location.hash.slice(1));
+  const q = new URLSearchParams(location.search);
+  const token = h.get('access_token');
+  const form = document.getElementById('form'), btn = document.getElementById('btn'), msg = document.getElementById('msg');
+  const s1 = document.getElementById('s1'), s2 = document.getElementById('s2');
+  history.replaceState(null, '', location.pathname);   // tira o código do endereço
+  document.getElementById('ver').addEventListener('change', (e) => { s1.type = s2.type = e.target.checked ? 'text' : 'password'; });
+  function bloquear(texto) { [...form.querySelectorAll('input,button')].forEach((el) => el.disabled = true); msg.innerHTML = texto; }
+  if (h.get('error_code') || q.get('error_code') || h.get('error')) {
+    bloquear('Este link expirou ou já foi usado. No app, toque em <b>Esqueci a senha</b> para receber um novo.');
+  } else if (!token || (h.get('type') && h.get('type') !== 'recovery')) {
+    bloquear('Abra esta página pelo link do e-mail <b>"Criar nova senha"</b> enviado pelo Lado. Para receber o e-mail, toque em <b>Esqueci a senha</b> no app.');
+  }
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const a = s1.value, b = s2.value;
+    if (a.length < 8 || !/[A-Za-z]/.test(a) || !/[0-9]/.test(a)) { msg.textContent = 'A senha precisa ter 8 ou mais caracteres, com letras e números.'; return; }
+    if (a !== b) { msg.textContent = 'As senhas não são iguais.'; return; }
+    btn.disabled = true; msg.textContent = 'Salvando...';
+    try {
+      const r = await fetch(SUPABASE_URL + '/auth/v1/user', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', apikey: SUPABASE_CHAVE, Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ password: a })
+      });
+      if (r.ok) {
+        fetch(SUPABASE_URL + '/auth/v1/logout', { method: 'POST', headers: { apikey: SUPABASE_CHAVE, Authorization: 'Bearer ' + token } }).catch(() => {});
+        bloquear('<span class="ok">Pronto! Sua senha foi alterada.</span> Volte ao app Lado e entre com o seu e-mail e a nova senha.');
+        return;
+      }
+      const j = await r.json().catch(() => ({}));
+      const cod = j.error_code || j.code || '';
+      if (cod === 'same_password') msg.textContent = 'A nova senha precisa ser diferente da atual.';
+      else if (cod === 'weak_password') msg.textContent = 'Senha fraca. Use mais caracteres, com letras e números.';
+      else if (r.status === 401 || r.status === 403) bloquear('Este link expirou. No app, toque em <b>Esqueci a senha</b> para receber um novo.');
+      else msg.textContent = 'Não foi possível salvar agora. Tente de novo.';
+    } catch (e) { msg.textContent = 'Sem conexão. Tente de novo.'; }
+    btn.disabled = false;
+  });
+</script>
+
+</main>
+<footer class="rodape"><div class="in">
+  <div class="col">
+    <a class="marca pequena" href="../" aria-label="Lado, página inicial"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><clipPath id="pl"><rect width="50" height="100"/></clipPath><clipPath id="pr"><rect x="50" width="50" height="100"/></clipPath></defs><path clip-path="url(#pl)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#E2483D"/><path clip-path="url(#pr)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#2F66D8"/><circle cx="50" cy="37" r="12" fill="#fff"/></svg><span>lado</span></a>
+    <span>Dois lados, um mapa.</span>
+    <span>© 2026 Lado</span>
+  </div>
+  <nav class="col" aria-label="Políticas">
+    <strong>Políticas</strong>
+    <a href="../termos/">Termos de uso</a>
+    <a href="../privacidade/">Política de privacidade</a>
+    <a href="../nao-reconheco/">Não reconheço um cadastro</a>
+    <a href="../excluir-conta/">Excluir minha conta</a>
+  </nav>
+  <nav class="col" aria-label="Contato">
+    <strong>Contato</strong>
+    <a href="https://wa.me/5527992650771?text=Ol%C3%A1!%20Preciso%20de%20ajuda%20com%20o%20app%20Lado." target="_blank" rel="noopener">WhatsApp (27) 99265-0771</a>
+    <a href="mailto:contato@ladoapp.com.br">contato@ladoapp.com.br</a>
+    <a href="../suporte/">Central de suporte</a>
+  </nav>
+</div></footer>
+</body>
+</html>
