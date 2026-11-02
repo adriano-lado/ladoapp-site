@@ -65,6 +65,8 @@
 .ae .check{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:15px}.ae .check input{width:20px;height:20px;flex:none;margin-top:2px}
 #mapa{height:320px;border-radius:14px;margin-top:10px;border:1px solid var(--borda)}
 .oculto{display:none!important}
+.ae .senhaBox{position:relative}.ae .senhaBox input{padding-right:92px}
+.ae .olho{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;font:inherit;font-weight:700;font-size:14px;color:var(--texto2);cursor:pointer;padding:8px 10px}
 </style>
 
 <div class="ae">
@@ -79,8 +81,8 @@
     <div class="abas"><button id="abaEntrar" class="on" type="button">Entrar</button><button id="abaCriar" type="button">Criar conta</button></div>
     <form id="formEntrar">
       <label for="email">E-mail</label><input id="email" type="email" autocomplete="email" required placeholder="voce@empresa.com.br">
-      <label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password" required minlength="8">
-      <div id="campoSenha2" class="oculto"><label for="senha2">Repita a senha</label><input id="senha2" type="password" autocomplete="new-password" minlength="8">
+      <label for="senha">Senha</label><div class="senhaBox"><input id="senha" type="password" autocomplete="current-password" required minlength="8"><button type="button" class="olho" data-olho="senha" aria-label="Mostrar senha">Mostrar</button></div>
+      <div id="campoSenha2" class="oculto"><label for="senha2">Repita a senha</label><div class="senhaBox"><input id="senha2" type="password" autocomplete="new-password" minlength="8"><button type="button" class="olho" data-olho="senha2" aria-label="Mostrar senha">Mostrar</button></div>
         <p class="spam" style="margin-top:6px">Use 8 ou mais caracteres, com letras e números.</p></div>
       <button class="botao" id="btnEntrar" type="submit">Entrar</button>
       <button class="link" id="btnEsqueci" type="button">Esqueci a senha</button>
@@ -242,6 +244,11 @@ function trocarModo(m) {
 }
 $('abaEntrar').onclick = () => trocarModo('entrar');
 $('abaCriar').onclick = () => trocarModo('criar');
+// Botão Mostrar/Ocultar senha
+document.querySelectorAll('[data-olho]').forEach(b => b.onclick = () => {
+  const i = $(b.dataset.olho); const ver = i.type === 'password';
+  i.type = ver ? 'text' : 'password'; b.textContent = ver ? 'Ocultar' : 'Mostrar'; b.setAttribute('aria-label', ver ? 'Ocultar senha' : 'Mostrar senha');
+});
 $('formEntrar').onsubmit = async (ev) => {
   ev.preventDefault(); msg('msgEntrar');
   const email = $('email').value.trim().toLowerCase(), senha = $('senha').value;
