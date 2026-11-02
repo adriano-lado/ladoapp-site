@@ -431,6 +431,11 @@ async function abrirVerificacao() {
   $('subtitulo').textContent = 'Falta só confirmar que você fala pela empresa.';
   try {
     const o = await chamarCodigo({ acao: 'opcoes', empresa_id: empresa.id });
+    if (o && o.verificada) {
+      $('btnEnviarCodigo').classList.add('oculto');
+      $('verifDestino').innerHTML = '<span class="ok">✓ Empresa verificada automaticamente!</span> O e-mail do seu login é o mesmo da Receita. Ela já está no mapa, com 5 dias de Destaque grátis. Enviamos um e-mail de boas-vindas.' + SPAM;
+      setTimeout(iniciar, 3500); return;
+    }
     $('verifDestino').innerHTML = o && o.email ? `O código vai para <strong>${esc(o.email)}</strong>.` : 'Não encontramos e-mail da empresa na Receita. Fale com a equipe no WhatsApp para verificar.';
     $('btnEnviarCodigo').classList.toggle('oculto', !(o && o.email));
   } catch { $('verifDestino').textContent = 'Não foi possível buscar os contatos da Receita agora. Tente de novo em instantes.'; }
@@ -501,13 +506,23 @@ $('btnCnpj').onclick = async () => {
     const f = (r.nome_fantasia || '').replace(/\s+/g, ' ').trim();
     const mei = !f || /\d{2}\.?\d{3}\.?\d{3}/.test(f) || dig(f).length >= 8 || f.toUpperCase() === (r.razao_social || '').toUpperCase().trim();
     $('nome').value = mei ? '' : f;
-    $('receitaTxt').innerHTML = `<strong>${esc(r.razao_social)}</strong><br>Situação: ${esc(r.descricao_situacao_cadastral)} · ${esc(r.municipio)} – ${esc(r.uf)}`;
+    $('receitaTxt').innerHTML = `<strong>${esc(r.razao_social)}</strong><br>Situação: ${esc(r.descricao_situacao_cadastral)} · ${esc(r.municipio)} – ${esc(r.uf)}` + await avisoEmail(r.email);
     $('endereco').value = [r.logradouro, r.numero].filter(Boolean).join(', '); $('bairro').value = r.bairro || '';
     $('dadosReceita').classList.remove('oculto');
     localizar([[r.logradouro, r.numero].filter(Boolean).join(', '), r.bairro, r.municipio, r.uf, 'Brasil'].filter(Boolean).join(', '), `${r.municipio}, ${r.uf}, Brasil`);
   } catch (e) { msg('msgCadastro', 'erro', e.message); cad.receita = null; $('dadosReceita').classList.add('oculto'); }
   finally { $('btnCnpj').disabled = false; }
 };
+
+// Avisa, já no 1º passo, para onde vai o código de verificação.
+const mascarar = (e) => { const [n, d] = e.split('@'); return n.slice(0, 2) + '***@' + d; };
+async function avisoEmail(emailReceita) {
+  const { data: { user } } = await sb.auth.getUser();
+  const meu = (user?.email || '').trim().toLowerCase(), dela = (emailReceita || '').trim().toLowerCase();
+  if (dela && meu === dela) return '<br><br><span class="ok">✓ O e-mail desta empresa na Receita é o mesmo do seu login. A verificação será automática, sem código.</span>';
+  if (dela) return `<br><br><strong>Verificação:</strong> vamos enviar um código para o e-mail da empresa na Receita, <strong>${esc(mascarar(dela))}</strong>. Se esse e-mail é seu, você pode entrar no Lado com ele para verificar na hora, sem código. Sem acesso a ele? A equipe confere com você pelo WhatsApp.`;
+  return '<br><br><strong>Verificação:</strong> a Receita não mostra e-mail para este CNPJ. Depois do cadastro, se o código não puder ser enviado, a equipe confere com você pelo WhatsApp.';
+}
 
 function desenharTipos() {
   const t = norm($('tipo').value);
