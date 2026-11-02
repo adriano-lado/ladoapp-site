@@ -263,6 +263,8 @@ $('formEntrar').onsubmit = async (ev) => {
       if (senha.length < 8 || !/[a-zA-Z]/.test(senha) || !/\d/.test(senha)) throw new Error('Use 8 ou mais caracteres, com letras e números.');
       const { data, error } = await sb.auth.signUp({ email, password: senha, options: { emailRedirectTo: AQUI } });
       if (error) throw new Error(/registered|already/i.test(error.message) ? 'Este e-mail já tem conta. Use "Entrar".' : 'Não foi possível criar a conta agora.');
+      // E-mail que já tem conta: o Supabase não dá erro nem manda e-mail (para não revelar contas). Avisamos aqui.
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) { trocarModo('entrar'); throw new Error('Este e-mail já tem conta no Lado. Entre com sua senha ou toque em "Esqueci a senha".'); }
       if (data.session) { await iniciar(); return; }
       msg('msgEntrar', 'ok', `Conta criada! Enviamos um link de confirmação para <strong>${esc(email)}</strong>. Abra o link e depois entre aqui.` + SPAM);
     }
