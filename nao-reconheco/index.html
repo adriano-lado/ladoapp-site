@@ -18,10 +18,15 @@
 
 <article class="doc">
 <h1>Não reconhece este cadastro?</h1>
-<p>Se alguém cadastrou a sua empresa no Lado sem autorização, toque no botão abaixo. O perfil sai do ar na hora e a nossa equipe analisa em até 24 horas.</p>
-<div class="cartao" style="display:grid;gap:12px;margin-top:16px">
+<p>Se alguém cadastrou a sua empresa no Lado sem autorização, o perfil sai do mapa. Veja abaixo como pedir.</p>
+<div class="cartao" id="comLink" style="display:grid;gap:12px;margin-top:16px">
+  <p style="margin:0">Toque no botão abaixo. O perfil sai do ar na hora e a nossa equipe analisa em até 24 horas.</p>
   <button class="botao vermelho" id="btn">Tirar o perfil do ar agora</button>
   <p id="msg" role="status" style="margin:0"></p>
+</div>
+<div class="cartao" id="semLink" hidden style="margin-top:16px">
+  <p style="margin:0 0 10px"><strong>Recebeu um aviso do Lado por e-mail ou SMS?</strong> Toque no link que veio na mensagem. Ele abre esta página com o botão para tirar o perfil do ar na hora.</p>
+  <p style="margin:0"><strong>Não recebeu nada, mas viu sua empresa no mapa?</strong> Escreva para <a href="mailto:contato@ladoapp.com.br?subject=N%C3%A3o%20reconhe%C3%A7o%20este%20cadastro">contato@ladoapp.com.br</a> com o CNPJ da empresa. Tiramos o perfil do ar e analisamos em até 24 horas.</p>
 </div>
 <p class="meta" style="margin-top:16px">Dúvidas: <a href="../suporte/">suporte</a> · contato@ladoapp.com.br</p>
 </article>
@@ -31,7 +36,7 @@
   const SUPABASE_CHAVE = 'sb_publishable_3HAUdFwaNBw8sEsGrVPtkw_OdzNtd15';
   const token = new URLSearchParams(location.search).get('t');
   const btn = document.getElementById('btn'), msg = document.getElementById('msg');
-  if (!token) { btn.disabled = true; msg.textContent = 'Link incompleto. Use o link exatamente como chegou no e-mail ou SMS.'; }
+  if (!token) { document.getElementById('comLink').style.display = 'none'; document.getElementById('semLink').hidden = false; }
   btn.addEventListener('click', async () => {
     btn.disabled = true; msg.textContent = 'Enviando...';
     try {
