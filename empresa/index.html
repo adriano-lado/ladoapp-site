@@ -196,8 +196,23 @@
           <button class="botao" data-plano="destaque" data-mod="pix" type="button">Pagar com Pix · 30 dias</button>
           <button class="botao claro" data-plano="destaque" data-mod="cartao" type="button">Assinar no cartão · mensal</button></div>
       </div>
-      <p class="spam">O pagamento é feito no Mercado Pago. Na fatura ou no extrato aparece "LADO". Se já tiver dias pagos do mesmo plano, os novos 30 dias são somados.</p>
+      <p class="spam">Pagamento seguro processado pelo Mercado Pago, aqui mesmo na página. Na fatura ou no extrato aparece "LADO". Se já tiver dias pagos do mesmo plano, os novos 30 dias são somados.</p>
       <div id="msgPlanos"></div>
+      <div id="caixaPag" class="oculto" style="margin-top:16px;border:2px solid var(--grafite);border-radius:16px;padding:18px">
+        <div class="linha" style="justify-content:space-between"><h2 id="tituloPag" style="margin:0;font-size:19px"></h2><button class="link" id="btnFecharPag" type="button" style="flex:0 0 auto;margin:0">Fechar</button></div>
+        <div id="areaPix" class="oculto" style="text-align:center">
+          <p class="sub" style="margin:8px 0">Abra o app do seu banco, escolha <strong>Pix → Ler QR Code</strong> ou <strong>Pix copia e cola</strong>.</p>
+          <img id="pixImg" alt="QR Code do Pix" style="width:230px;height:230px;max-width:100%;background:#fff;border-radius:12px;padding:8px">
+          <textarea id="pixCodigo" readonly rows="3" style="width:100%;margin-top:10px;font:inherit;font-size:13px;padding:10px;border-radius:10px;border:1px solid var(--borda);background:var(--fundo);color:var(--texto)"></textarea>
+          <button class="botao" id="btnCopiarPix" type="button">Copiar código Pix</button>
+          <p class="spam">O Pix vale 30 dias de plano e não renova sozinho. Pagamento processado pelo Mercado Pago; no extrato aparece "LADO".</p>
+        </div>
+        <div id="areaCartao" class="oculto">
+          <p class="sub" style="margin:8px 0">Assinatura mensal no cartão de crédito. Renova sozinha todo mês e você cancela quando quiser aqui na Área da empresa. Os dados do cartão vão direto para o Mercado Pago, com segurança; o Lado não vê nem guarda o cartão.</p>
+          <div id="cardBrick"></div>
+        </div>
+        <div id="msgPag"></div>
+      </div>
     </div>
 
     <div class="bloco" id="blocoAssinatura"></div>
@@ -387,19 +402,100 @@ const ERROS = {
   PRAZO: 'O prazo de 7 dias para reembolso deste pagamento já passou.',
   SEM_PAGAMENTO: 'Este pagamento não pode ser reembolsado.',
   MANUAL: 'Este pagamento precisa ser reembolsado pela equipe. Fale com a gente no WhatsApp (27) 99265-0771.',
+  CARTAO: 'O cartão não foi aprovado. Confira os dados ou tente outro cartão (ou pague com Pix).',
 };
 async function chamarPlanos(corpo) {
   const { data, error } = await sb.functions.invoke('planos', { body: corpo });
   if (error) { let c = 'ERRO'; try { c = (await error.context.json()).erro || 'ERRO'; } catch {} return { erro: ERROS[c] || 'Não foi possível concluir agora. Tente de novo em instantes ou fale com a equipe.' }; }
   return data || {};
 }
-document.querySelectorAll('[data-plano]').forEach(btn => btn.onclick = async () => {
-  msg('msgPlanos', 'info', 'Abrindo o Mercado Pago…');
-  document.querySelectorAll('[data-plano]').forEach(b => b.disabled = true);
-  const r = await chamarPlanos({ acao: 'pagar', empresa_id: empresa.id, plano: btn.dataset.plano, modalidade: btn.dataset.mod, retorno: AQUI + '?pago=1' });
-  if (r.url) { location.href = r.url; return; }
-  msg('msgPlanos', 'erro', r.erro || 'Não foi possível abrir o pagamento.');
+/* ---------- Pagamento direto no site (Mercado Pago embutido: Pix e cartão) ---------- */
+const PRECO = { vitrine: 39.90, destaque: 79.90 };
+let espera = null, brick = null, chavePub = null;
+function fecharPag() {
+  $('caixaPag').classList.add('oculto'); msg('msgPag');
+  if (espera) { clearInterval(espera); espera = null; }
+  if (brick) { try { brick.unmount(); } catch {} brick = null; }
   document.querySelectorAll('[data-plano]').forEach(b => b.disabled = false);
+}
+$('btnFecharPag').onclick = fecharPag;
+function abrirCaixa(titulo, area) {
+  document.querySelectorAll('[data-plano]').forEach(b => b.disabled = true);
+  $('caixaPag').classList.remove('oculto'); $('tituloPag').textContent = titulo; msg('msgPag');
+  $('areaPix').classList.toggle('oculto', area !== 'pix'); $('areaCartao').classList.toggle('oculto', area !== 'cartao');
+  $('caixaPag').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+// Confere a cada 4 s (por até 30 min) se o plano já foi liberado pelo Mercado Pago.
+function esperarLiberacao() {
+  const antes = `${empresa.plano}|${empresa.plano_ate}`; const ini = Date.now();
+  if (espera) clearInterval(espera);
+  espera = setInterval(async () => {
+    if (Date.now() - ini > 30 * 60000) { clearInterval(espera); espera = null; return; }
+    const { data } = await sb.rpc('minha_empresa'); const e = data && data[0];
+    if (e && `${e.plano}|${e.plano_ate}` !== antes) {
+      fecharPag(); empresa = e; await abrirPainel();
+      msg('msgPainel', 'ok', `Pagamento confirmado! Plano <strong>${NOME[e.plano]}</strong> ativo até <strong>${dataBR(e.plano_ate)}</strong>. Já vale no app (feche e abra o app). Enviamos a confirmação por e-mail.` + SPAM);
+      $('msgPainel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, 4000);
+}
+async function pagarPix(plano) {
+  abrirCaixa(`Pix · Plano ${NOME[plano]} · ${reais(PRECO[plano])} · 30 dias`, 'pix');
+  $('pixImg').removeAttribute('src'); $('pixCodigo').value = ''; msg('msgPag', 'info', 'Gerando o Pix…');
+  const r = await chamarPlanos({ acao: 'pix', empresa_id: empresa.id, plano });
+  if (r.erro || !r.qr) { msg('msgPag', 'erro', r.erro || 'Não foi possível gerar o Pix agora. Tente de novo.'); return; }
+  $('pixImg').src = 'data:image/png;base64,' + r.qr_base64; $('pixCodigo').value = r.qr;
+  msg('msgPag', 'info', '⏳ Aguardando o pagamento… Assim que o Pix cair, o plano é liberado aqui e no app, sem você fazer nada.');
+  esperarLiberacao();
+}
+$('btnCopiarPix').onclick = async () => {
+  try { await navigator.clipboard.writeText($('pixCodigo').value); } catch { $('pixCodigo').select(); document.execCommand('copy'); }
+  $('btnCopiarPix').textContent = 'Copiado ✓'; setTimeout(() => $('btnCopiarPix').textContent = 'Copiar código Pix', 2500);
+};
+function carregarSdk() {
+  return new Promise((ok, erro) => {
+    if (window.MercadoPago) return ok();
+    const s = document.createElement('script'); s.src = 'https://sdk.mercadopago.com/js/v2'; s.onload = ok; s.onerror = erro; document.head.appendChild(s);
+  });
+}
+async function pagarCartao(plano) {
+  abrirCaixa(`Cartão · Plano ${NOME[plano]} · ${reais(PRECO[plano])}/mês`, 'cartao');
+  $('cardBrick').innerHTML = ''; msg('msgPag', 'info', 'Carregando o formulário seguro do Mercado Pago…');
+  try {
+    if (!chavePub) chavePub = (await chamarPlanos({ acao: 'config', empresa_id: empresa.id })).public_key;
+    if (!chavePub) throw new Error('sem chave');
+    await carregarSdk();
+    const { data: { user } } = await sb.auth.getUser();
+    const mpg = new MercadoPago(chavePub, { locale: 'pt-BR' });
+    brick = await mpg.bricks().create('cardPayment', 'cardBrick', {
+      initialization: { amount: PRECO[plano], payer: { email: user.email } },
+      customization: { paymentMethods: { maxInstallments: 1, types: { excluded: ['debit_card', 'prepaid_card'] } }, visual: { hidePaymentButton: false } },
+      callbacks: {
+        onReady: () => msg('msgPag'),
+        onError: (e) => console.error(e),
+        onSubmit: (dados) => new Promise(async (ok, falha) => {
+          msg('msgPag', 'info', 'Processando…');
+          const r = await chamarPlanos({ acao: 'assinar', empresa_id: empresa.id, plano, card_token: dados.token });
+          if (r.erro) { msg('msgPag', 'erro', r.erro); falha(); return; }
+          ok();
+          msg('msgPag', 'ok', '✓ Assinatura criada! Estamos confirmando a primeira cobrança. O plano é liberado aqui e no app em instantes.');
+          esperarLiberacao();
+        }),
+      },
+    });
+  } catch (e) {
+    msg('msgPag', 'erro', 'O pagamento com cartão aqui no site está indisponível agora. Use o Pix ou <a href="#" id="linkMP">pague na página do Mercado Pago</a>.');
+    const l = document.getElementById('linkMP'); if (l) l.onclick = (ev) => { ev.preventDefault(); pagarNaPaginaMP(plano, 'cartao'); };
+  }
+}
+// Alternativa: página do Mercado Pago (como antes).
+async function pagarNaPaginaMP(plano, modalidade) {
+  const r = await chamarPlanos({ acao: 'pagar', empresa_id: empresa.id, plano, modalidade, retorno: AQUI + '?pago=1' });
+  if (r.url) { location.href = r.url; return; }
+  msg('msgPag', 'erro', r.erro || 'Não foi possível abrir o pagamento.');
+}
+document.querySelectorAll('[data-plano]').forEach(btn => btn.onclick = () => {
+  if (btn.dataset.mod === 'pix') pagarPix(btn.dataset.plano); else pagarCartao(btn.dataset.plano);
 });
 
 // Volta do Mercado Pago: confere por até 1 minuto se o plano já foi liberado.
