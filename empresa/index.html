@@ -186,6 +186,7 @@
     <div class="bloco" id="blocoPlanos">
       <h2>Planos para aparecer mais</h2>
       <p class="sub" style="margin:0">Sem fidelidade. <strong>Pix</strong>: vale 30 dias e não renova sozinho. <strong>Cartão</strong>: renova todo mês, cancele quando quiser. Arrependeu? Reembolso total em até 7 dias.</p>
+      <div id="cupomAviso" class="oculto"></div>
       <div class="planos">
         <div class="plano prata"><h2 style="margin:0">Vitrine</h2><div class="preco">R$ 39,90 <small>/mês</small></div>
           <ul><li>Contorno prata no mapa</li><li>30 fotos</li><li>3 publicações por semana</li><li>2 ofertas com cupom</li></ul>
@@ -250,6 +251,15 @@ const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov'
 const COR = { esquerda: '#C93A30', direita: '#2556BE' };
 let empresa = null;
 
+// Cupom dos e-mails de recuperação (?cupom=VOLTA...): guardado até a pessoa entrar e usar.
+let cupom = null;
+(() => {
+  const u = new URL(location.href), c = u.searchParams.get('cupom');
+  if (!c) return;
+  try { sessionStorage.setItem('lado-cupom', c.toUpperCase()); } catch {}
+  u.searchParams.delete('cupom'); history.replaceState(null, '', u.pathname + u.search + u.hash);
+})();
+
 /* ---------------- Entrar / criar conta ---------------- */
 let modo = 'entrar';
 function trocarModo(m) {
@@ -303,7 +313,30 @@ async function iniciar() {
   if (error || !empresa) { abrirCadastro(); return; }
   if (empresa.status === 'pendente') { abrirVerificacao(); return; }
   await abrirPainel();
+  await prepararCupom();
+  irParaAncora();
 }
+// Links dos e-mails: #blocoPlanos, #blocoOferta
+function irParaAncora() {
+  const alvo = location.hash && document.getElementById(location.hash.slice(1));
+  if (alvo && !alvo.classList.contains('oculto')) setTimeout(() => alvo.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+}
+async function prepararCupom() {
+  let codigo = null; try { codigo = sessionStorage.getItem('lado-cupom'); } catch {}
+  if (!codigo) return;
+  const r = await chamarPlanos({ acao: 'cupom', empresa_id: empresa.id, cupom: codigo });
+  const caixa = $('cupomAviso'); caixa.classList.remove('oculto');
+  if (r.erro || !r.codigo) {
+    cupom = null; try { sessionStorage.removeItem('lado-cupom'); } catch {}
+    caixa.innerHTML = '<div class="msg info">O cupom <strong>' + esc(codigo) + '</strong> não vale mais (expirou ou já foi usado). Os planos continuam disponíveis pelo preço normal.</div>';
+    return;
+  }
+  cupom = r;
+  const ate = new Date(r.valido_ate).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', ' às');
+  caixa.innerHTML = `<div class="msg ok">🎁 <strong>Cupom ${esc(r.codigo)} ativo: ${r.percentual}% off</strong> no primeiro mês pagando com <strong>Pix</strong>. ` +
+    `Vitrine por <strong>${reais(comCupom('vitrine'))}</strong> · Destaque por <strong>${reais(comCupom('destaque'))}</strong>. Válido até ${ate}.</div>`;
+}
+const comCupom = (plano) => cupom ? Math.round(PRECO[plano] * (100 - cupom.percentual)) / 100 : PRECO[plano];
 
 /* ---------------- Painel ---------------- */
 async function abrirPainel() {
@@ -402,6 +435,7 @@ const ERROS = {
   PRAZO: 'O prazo de 7 dias para reembolso deste pagamento já passou.',
   SEM_PAGAMENTO: 'Este pagamento não pode ser reembolsado.',
   MANUAL: 'Este pagamento precisa ser reembolsado pela equipe. Fale com a gente no WhatsApp (27) 99265-0771.',
+  CUPOM: 'Este cupom não vale mais (expirou ou já foi usado). Gere o Pix de novo pelo preço normal.',
   CARTAO: 'O cartão não foi aprovado. Confira os dados ou tente outro cartão (ou pague com Pix).',
 };
 async function chamarPlanos(corpo) {
@@ -440,9 +474,11 @@ function esperarLiberacao() {
   }, 4000);
 }
 async function pagarPix(plano) {
-  abrirCaixa(`Pix · Plano ${NOME[plano]} · ${reais(PRECO[plano])} · 30 dias`, 'pix');
+  const preco = comCupom(plano);
+  abrirCaixa(`Pix · Plano ${NOME[plano]} · ${reais(preco)}${cupom ? ` (${cupom.percentual}% off)` : ''} · 30 dias`, 'pix');
   $('pixImg').removeAttribute('src'); $('pixCodigo').value = ''; msg('msgPag', 'info', 'Gerando o Pix…');
-  const r = await chamarPlanos({ acao: 'pix', empresa_id: empresa.id, plano });
+  const r = await chamarPlanos({ acao: 'pix', empresa_id: empresa.id, plano, ...(cupom ? { cupom: cupom.codigo } : {}) });
+  if (r.erro && cupom) { cupom = null; try { sessionStorage.removeItem('lado-cupom'); } catch {} $('cupomAviso').classList.add('oculto'); }
   if (r.erro || !r.qr) { msg('msgPag', 'erro', r.erro || 'Não foi possível gerar o Pix agora. Tente de novo.'); return; }
   $('pixImg').src = 'data:image/png;base64,' + r.qr_base64; $('pixCodigo').value = r.qr;
   msg('msgPag', 'info', '⏳ Aguardando o pagamento… Assim que o Pix cair, o plano é liberado aqui e no app, sem você fazer nada.');
@@ -460,7 +496,8 @@ function carregarSdk() {
 }
 async function pagarCartao(plano) {
   abrirCaixa(`Cartão · Plano ${NOME[plano]} · ${reais(PRECO[plano])}/mês`, 'cartao');
-  $('cardBrick').innerHTML = ''; msg('msgPag', 'info', 'Carregando o formulário seguro do Mercado Pago…');
+  $('cardBrick').innerHTML = ''; msg('msgPag', 'info', 'Carregando o formulário seguro do Mercado Pago…' + (cupom ? '<br>O cupom de desconto vale só no Pix.' : ''));
+  chamarPlanos({ acao: 'iniciar', empresa_id: empresa.id, plano, modalidade: 'cartao' });
   try {
     if (!chavePub) chavePub = (await chamarPlanos({ acao: 'config', empresa_id: empresa.id })).public_key;
     if (!chavePub) throw new Error('sem chave');
@@ -469,7 +506,7 @@ async function pagarCartao(plano) {
     const mpg = new MercadoPago(chavePub, { locale: 'pt-BR' });
     brick = await mpg.bricks().create('cardPayment', 'cardBrick', {
       initialization: { amount: PRECO[plano], payer: { email: user.email } },
-      customization: { paymentMethods: { maxInstallments: 1, types: { excluded: ['debit_card', 'prepaid_card'] } }, visual: { hidePaymentButton: false } },
+      customization: { paymentMethods: { maxInstallments: 1, types: { excluded: ['debit_card', 'prepaid_card'] } }, visual: { hidePaymentButton: false, texts: { formTitle: 'Cartão de crédito' } } },
       callbacks: {
         onReady: () => msg('msgPag'),
         onError: (e) => console.error(e),
