@@ -348,9 +348,18 @@ async function abrirPainel() {
   const emTeste = e.plano === 'gratis' && e.teste_destaque_ate && new Date(e.teste_destaque_ate) > new Date();
   $('pPlano').innerHTML = e.status === 'suspensa'
     ? '<strong>Empresa fora do mapa.</strong> Fale com a equipe para entender o motivo.'
-    : `Plano atual: <strong>${NOME[e.plano]}</strong>` + (e.plano !== 'gratis' && e.plano_ate ? ` · vale até <strong>${dataBR(e.plano_ate)}</strong>` : '') +
+    : (e.status === 'oculta' ? '<strong>Sua empresa está fora do mapa</strong> (você tirou pelo app). Ninguém vê o perfil agora; plano, fotos e estatísticas continuam guardados. <button class="botao" id="btnVoltarMapa" type="button" style="margin-top:10px">Voltar ao mapa</button><br>' : '') +
+      `Plano atual: <strong>${NOME[e.plano]}</strong>` + (e.plano !== 'gratis' && e.plano_ate ? ` · vale até <strong>${dataBR(e.plano_ate)}</strong>` : '') +
       (emTeste ? ` · com teste grátis do Destaque até <strong>${dataBR(e.teste_destaque_ate)}</strong>` : '');
   $('blocoPlanos').classList.toggle('oculto', e.status !== 'publicada');
+  const bv = document.getElementById('btnVoltarMapa');
+  if (bv) bv.onclick = async () => {
+    bv.disabled = true;
+    const { error } = await sb.rpc('voltar_ao_mapa');
+    if (error) { bv.disabled = false; msg('msgPainel', 'erro', 'Não foi possível voltar ao mapa agora. Tente de novo ou fale com a equipe.'); return; }
+    const { data } = await sb.rpc('minha_empresa'); if (data && data[0]) empresa = data[0];
+    await abrirPainel(); msg('msgPainel', 'ok', 'Sua empresa voltou ao mapa ✓ O perfil já aparece de novo para os clientes.');
+  };
   await Promise.all([carregarOferta(), carregarEstatisticas(), carregarAssinatura(), carregarPagamentos()]);
 }
 
