@@ -7,7 +7,7 @@
 <meta name="description" content="Encontre empresas que mostram o seu lado e escolha onde comprar.">
 <meta name="theme-color" content="#1B2228">
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./estilo.css?v=20261103i">
+<link rel="stylesheet" href="./estilo.css?v=20261103j">
 </head>
 <body>
 <header class="topo">
@@ -29,15 +29,21 @@
     <div class="setas"><button type="button" id="telaAnt" aria-label="Tela anterior">‹</button><button type="button" id="telaProx" aria-label="Próxima tela">›</button></div>
   </div>
   <div class="trilho" id="trilho" tabindex="0" aria-label="Telas do aplicativo">
-    <figure><img src="./telas/c-1-mapa.webp" width="300" height="602" loading="lazy" decoding="async" alt="Mapa com as empresas perto de você"><figcaption><strong>Encontre empresas perto de você</strong><span>Esquerda ou direita: as empresas mostram o seu lado.</span></figcaption></figure>
-    <figure><img class="duplo" src="./telas/c-5-filtro.webp" width="440" height="433" loading="lazy" decoding="async" alt="Filtro Todas, Esquerda ou Direita"><figcaption><strong>Filtre pelo lado que você prefere</strong><span>Seu filtro fica só no seu celular.</span></figcaption></figure>
-    <figure><img src="./telas/c-2-lista.webp" width="300" height="602" loading="lazy" decoding="async" alt="Lista das empresas próximas"><figcaption><strong>Veja quem está perto e qual é o lado</strong><span>Destaques, distância e ofertas em uma lista.</span></figcaption></figure>
-    <figure><img src="./telas/c-3-oferta.webp" width="300" height="602" loading="lazy" decoding="async" alt="Perfil da empresa com cupom de desconto"><figcaption><strong>Ofertas e cupons da sua região</strong><span>Pegue o cupom e mostre no caixa.</span></figcaption></figure>
-    <figure><img src="./telas/c-4-publicacoes.webp" width="300" height="602" loading="lazy" decoding="async" alt="Publicações da empresa"><figcaption><strong>Acompanhe as novidades</strong><span>Fotos e publicações feitas pela própria empresa.</span></figcaption></figure>
-    <figure><img src="./telas/c-6-empresas.webp" width="300" height="602" loading="lazy" decoding="async" alt="Área da empresa no app"><figcaption><strong>Tem uma empresa? Coloque no mapa</strong><span>Cadastro grátis, publicações e ofertas.</span></figcaption></figure>
+    <figure><img src="./telas/c-1-mapa.webp" data-grande="./telas/z-1-mapa.webp" width="300" height="602" loading="lazy" decoding="async" alt="Mapa com as empresas perto de você"><figcaption><strong>Encontre empresas perto de você</strong><span>Esquerda ou direita: as empresas mostram o seu lado.</span></figcaption></figure>
+    <figure><img class="duplo" src="./telas/c-5-filtro.webp" data-grande="./telas/z-5-filtro.webp" width="440" height="433" loading="lazy" decoding="async" alt="Filtro Todas, Esquerda ou Direita"><figcaption><strong>Filtre pelo lado que você prefere</strong><span>Seu filtro fica só no seu celular.</span></figcaption></figure>
+    <figure><img src="./telas/c-2-lista.webp" data-grande="./telas/z-2-lista.webp" width="300" height="602" loading="lazy" decoding="async" alt="Lista das empresas próximas"><figcaption><strong>Veja quem está perto e qual é o lado</strong><span>Destaques, distância e ofertas em uma lista.</span></figcaption></figure>
+    <figure><img src="./telas/c-3-oferta.webp" data-grande="./telas/z-3-oferta.webp" width="300" height="602" loading="lazy" decoding="async" alt="Perfil da empresa com cupom de desconto"><figcaption><strong>Ofertas e cupons da sua região</strong><span>Pegue o cupom e mostre no caixa.</span></figcaption></figure>
+    <figure><img src="./telas/c-4-publicacoes.webp" data-grande="./telas/z-4-publicacoes.webp" width="300" height="602" loading="lazy" decoding="async" alt="Publicações da empresa"><figcaption><strong>Acompanhe as novidades</strong><span>Fotos e publicações feitas pela própria empresa.</span></figcaption></figure>
+    <figure><img src="./telas/c-6-empresas.webp" data-grande="./telas/z-6-empresas.webp" width="300" height="602" loading="lazy" decoding="async" alt="Área da empresa no app"><figcaption><strong>Tem uma empresa? Coloque no mapa</strong><span>Cadastro grátis, publicações e ofertas.</span></figcaption></figure>
   </div>
   <div class="pontos" id="pontos" aria-label="Escolher tela"></div>
-  <p class="nota">Imagens ilustrativas, com empresas de exemplo.</p>
+  <p class="nota">Toque em uma tela para ver maior. Imagens ilustrativas, com empresas de exemplo.</p>
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Tela ampliada">
+    <button type="button" class="lb-fechar" id="lbFechar" aria-label="Fechar">&times;</button>
+    <button type="button" class="lb-seta lb-ant" id="lbAnt" aria-label="Tela anterior">&lsaquo;</button>
+    <img id="lbImg" alt="">
+    <button type="button" class="lb-seta lb-prox" id="lbProx" aria-label="Próxima tela">&rsaquo;</button>
+  </div>
 </section>
 <script>
 (function(){
@@ -55,6 +61,17 @@
   t.addEventListener('scroll',function(){window.requestAnimationFrame(marcar)},{passive:true});
   t.addEventListener('keydown',function(e){if(e.key==='ArrowRight'){e.preventDefault();ir(atual()+1)}if(e.key==='ArrowLeft'){e.preventDefault();ir(atual()-1)}});
   window.addEventListener('resize',marcar); marcar();
+  var lb=document.getElementById('lightbox'), li=document.getElementById('lbImg'), at=0, x0=null;
+  function abrir(i){at=(i+f.length)%f.length; var im=f[at].querySelector('img'); li.src=im.getAttribute('data-grande'); li.alt=im.alt; lb.hidden=false; document.body.style.overflow='hidden'; document.getElementById('lbFechar').focus();}
+  function fechar(){lb.hidden=true; li.removeAttribute('src'); document.body.style.overflow=''; ir(at);}
+  f.forEach(function(el,i){el.addEventListener('click',function(){abrir(i)});});
+  document.getElementById('lbFechar').onclick=fechar;
+  document.getElementById('lbAnt').onclick=function(e){e.stopPropagation();abrir(at-1)};
+  document.getElementById('lbProx').onclick=function(e){e.stopPropagation();abrir(at+1)};
+  lb.addEventListener('click',function(e){if(e.target===lb)fechar()});
+  document.addEventListener('keydown',function(e){if(lb.hidden)return; if(e.key==='Escape')fechar(); if(e.key==='ArrowRight')abrir(at+1); if(e.key==='ArrowLeft')abrir(at-1);});
+  lb.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+  lb.addEventListener('touchend',function(e){if(x0===null)return; var dx=e.changedTouches[0].clientX-x0; x0=null; if(Math.abs(dx)>50)abrir(at+(dx<0?1:-1));},{passive:true});
 })();
 </script>
 
@@ -72,7 +89,7 @@
   <div class="grade">
     <a class="cartao gratis plano-link" href="/empresa/"><h3>Grátis</h3><p>Ponto no mapa com selo Verificado, 3 fotos, 1 publicação por semana e 1 oferta.</p><span class="cta">Cadastrar grátis →</span></a>
     <a class="cartao prata plano-link" href="/empresa/#blocoPlanos"><span class="selo-ouro selo-prata"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>Boa visibilidade</span><h3>Vitrine · R$ 39,90/mês</h3><p>Contorno prata no mapa, 30 fotos, 3 publicações por semana e 2 ofertas.</p><span class="cta">Quero o Vitrine →</span></a>
-    <a class="cartao ouro plano-link" href="/empresa/#blocoPlanos"><span class="selo-ouro"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M6 3h12v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v3H8v-3h3v-2.1A5 5 0 0 1 7.3 12H7a4 4 0 0 1-4-4V5h3V3zm-1 4v1a2 2 0 0 0 1 1.7V7H5zm13 0v2.7A2 2 0 0 0 19 8V7h-1z"/></svg>Mais visibilidade</span><h3>Destaque · R$ 79,90/mês</h3><p>Contorno dourado com estrela, topo do bairro, publicações e ofertas ilimitadas e prioridade em "Perto de você".</p><span class="cta">Quero o Destaque →</span></a>
+    <a class="cartao ouro plano-link" href="/empresa/#blocoPlanos"><span class="selo-ouro"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>Mais visibilidade</span><h3>Destaque · R$ 79,90/mês</h3><p>Contorno dourado com estrela, topo do bairro, publicações e ofertas ilimitadas e prioridade em "Perto de você".</p><span class="cta">Quero o Destaque →</span></a>
   </div>
   <p style="margin-top:18px">Disponível em <strong>todo o Brasil</strong>: o mapa abre na sua região e mostra as empresas perto de você. Toda empresa nova ganha 5 dias de Destaque. Você pode sair a qualquer momento, com um toque.</p>
   <p style="margin-top:14px"><a class="botao" href="./empresa/">Área da empresa: cadastrar ou contratar um plano →</a> <a class="botao" style="background:transparent;color:var(--texto);border:1px solid var(--borda)" href="./como-usar/">Passo a passo</a></p>
