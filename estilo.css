@@ -79,6 +79,7 @@ a.plano-link p{flex:1}
 .gratis .cta{background:#1F7A4D;color:#fff}
 .prata .cta{background:#A9B4BE;color:#1B2228}
 .ouro .cta{background:#F0B429;color:#1B2228}
+.cartao.prata{position:relative}.selo-ouro.selo-prata{background:#A9B4BE;color:#1B2228;box-shadow:0 4px 12px rgba(120,130,140,.35)}
 /* ---- Como usar ---- */
 .guia-topo{display:grid;gap:10px;padding:40px 0 8px}
 .guia-topo h1{font-family:"Familjen Grotesk",sans-serif;font-size:clamp(34px,6vw,54px);line-height:1.05;margin:0;letter-spacing:-1.5px}
