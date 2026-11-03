@@ -61,7 +61,7 @@ details p{margin:8px 0 0;color:var(--texto2)}
 .trilho figcaption{align-self:center;padding-bottom:22px}
 .trilho figcaption strong{display:block;font-family:"Familjen Grotesk",sans-serif;font-size:24px;line-height:1.15;letter-spacing:-.3px;margin-bottom:8px}
 .trilho figcaption span{display:block;font-size:15px;color:#C9D1D7}
-@media (max-width:760px){.trilho figure{flex-basis:88%;height:250px;padding:18px 14px 0 16px;gap:12px;grid-template-columns:44% 1fr}.trilho img.duplo{margin-bottom:18px}.trilho figcaption{padding-bottom:16px}.trilho figcaption strong{font-size:18px}.trilho figcaption span{font-size:13px}.setas{display:none}}
+@media (max-width:760px){.trilho figure{flex-basis:90%;height:330px;padding:20px 14px 0 16px;gap:12px;grid-template-columns:52% 1fr}.trilho img.duplo{margin-bottom:18px}.trilho figcaption{padding-bottom:16px}.trilho figcaption strong{font-size:18px}.trilho figcaption span{font-size:13px}.setas{display:none}}
 .pontos{display:flex;justify-content:center;gap:8px;margin-top:8px}
 .pontos button{width:9px;height:9px;padding:0;border-radius:50%;border:0;background:var(--borda);cursor:pointer}
 .pontos button[aria-current="true"]{background:var(--texto);width:22px;border-radius:6px}
@@ -70,7 +70,6 @@ details p{margin:8px 0 0;color:var(--texto2)}
 .cartao.ouro{position:relative;border:2px solid #F0B429;background:linear-gradient(180deg,rgba(240,180,41,.14),rgba(240,180,41,.03) 60%),var(--sup);box-shadow:0 0 0 4px rgba(240,180,41,.18),0 12px 30px rgba(240,180,41,.22)}
 .selo-ouro{position:absolute;top:-13px;left:18px;background:#F0B429;color:#1B2228;font-weight:800;font-size:12px;letter-spacing:.4px;text-transform:uppercase;border-radius:999px;padding:4px 12px;box-shadow:0 4px 12px rgba(240,180,41,.35)}
 .cartao.prata{border:2px solid #A9B4BE;background:linear-gradient(180deg,rgba(169,180,190,.16),rgba(169,180,190,.03) 60%),var(--sup);box-shadow:0 0 0 4px rgba(169,180,190,.18),0 10px 24px rgba(120,130,140,.18)}
-@media (prefers-color-scheme: dark){.botao{background:#F6F7F8;color:#1B2228}.botao.verde{background:#1F7A4D;color:#fff}.botao.vermelho{background:var(--esq);color:#fff}.trilho figure{border:1px solid var(--borda)}.setas button{background:#1E2830}}
 /* ---- Como usar ---- */
 .guia-topo{display:grid;gap:10px;padding:40px 0 8px}
 .guia-topo h1{font-family:"Familjen Grotesk",sans-serif;font-size:clamp(34px,6vw,54px);line-height:1.05;margin:0;letter-spacing:-1.5px}
