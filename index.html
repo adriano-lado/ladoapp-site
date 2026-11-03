@@ -23,6 +23,41 @@
   <div class="lojas" aria-label="Lojas de aplicativos"><span class="selo">Em breve na Google Play</span><span class="selo">Em breve na App Store</span></div>
 </section>
 
+<section class="telas" aria-labelledby="tit-telas">
+  <div class="cab">
+    <div><h2 id="tit-telas">Veja o app por dentro</h2><p>Arraste para o lado e conheça as telas do Lado.</p></div>
+    <div class="setas"><button type="button" id="telaAnt" aria-label="Tela anterior">‹</button><button type="button" id="telaProx" aria-label="Próxima tela">›</button></div>
+  </div>
+  <div class="trilho" id="trilho" tabindex="0" aria-label="Telas do aplicativo">
+    <figure><img src="./telas/1-mapa.webp" width="400" height="711" loading="lazy" decoding="async" alt="Mapa com as empresas perto de você, cada uma com a cor do lado que declarou"></figure>
+    <figure><img src="./telas/5-filtro.webp" width="400" height="711" loading="lazy" decoding="async" alt="Filtro Todas, Esquerda ou Direita: o filtro fica só no seu celular"></figure>
+    <figure><img src="./telas/2-lista.webp" width="400" height="711" loading="lazy" decoding="async" alt="Lista das empresas próximas com distância, lado e ofertas"></figure>
+    <figure><img src="./telas/3-oferta.webp" width="400" height="711" loading="lazy" decoding="async" alt="Perfil da empresa com fotos, como chegar, WhatsApp e cupom de desconto"></figure>
+    <figure><img src="./telas/4-publicacoes.webp" width="400" height="711" loading="lazy" decoding="async" alt="Publicações feitas pela própria empresa"></figure>
+    <figure><img src="./telas/6-empresas.webp" width="400" height="711" loading="lazy" decoding="async" alt="Área da empresa: cadastro grátis, publicações, ofertas e fotos"></figure>
+  </div>
+  <div class="pontos" id="pontos" aria-label="Escolher tela"></div>
+  <p class="nota">Imagens ilustrativas, com empresas de exemplo.</p>
+</section>
+<script>
+(function(){
+  var t=document.getElementById('trilho'); if(!t) return;
+  var f=[].slice.call(t.querySelectorAll('figure')), p=document.getElementById('pontos');
+  var ant=document.getElementById('telaAnt'), prox=document.getElementById('telaProx');
+  f.forEach(function(el,i){var b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Tela '+(i+1));b.onclick=function(){ir(i)};p.appendChild(b);});
+  function passo(){return f.length>1?f[1].offsetLeft-f[0].offsetLeft:t.clientWidth;}
+  function atual(){return Math.round(t.scrollLeft/passo());}
+  function ir(i){t.scrollTo({left:Math.max(0,Math.min(i,f.length-1))*passo()});}
+  function marcar(){var i=atual(),fim=t.scrollLeft+t.clientWidth>=t.scrollWidth-4;
+    [].forEach.call(p.children,function(b,k){b.setAttribute('aria-current',k===(fim?f.length-1:i)?'true':'false')});
+    ant.disabled=t.scrollLeft<=4; prox.disabled=fim;}
+  ant.onclick=function(){ir(atual()-1)}; prox.onclick=function(){ir(atual()+1)};
+  t.addEventListener('scroll',function(){window.requestAnimationFrame(marcar)},{passive:true});
+  t.addEventListener('keydown',function(e){if(e.key==='ArrowRight'){e.preventDefault();ir(atual()+1)}if(e.key==='ArrowLeft'){e.preventDefault();ir(atual()-1)}});
+  window.addEventListener('resize',marcar); marcar();
+})();
+</script>
+
 <section class="secao" id="como-funciona">
   <h2>Como funciona</h2>
   <div class="grade">
