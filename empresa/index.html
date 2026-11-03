@@ -134,7 +134,7 @@
     <div data-passo="5" class="oculto">
       <h2>Autorização de exibição pública</h2>
       <label class="check"><input type="checkbox" id="ok1"><span id="ok1txt"></span></label>
-      <label class="check"><input type="checkbox" id="ok2"><span>Sei que posso alterar ou remover essa informação a qualquer momento, e que ela será apagada em até 24 horas após o pedido.</span></label>
+      <label class="check"><input type="checkbox" id="ok2"><span>Sei que posso mudar de lado ou tirar minha empresa do mapa a qualquer momento (ela deixa de ser exibida na hora) e que, ao excluir a conta, a declaração e os dados são apagados.</span></label>
       <label class="check"><input type="checkbox" id="ok3"><span>Li e aceito os <a href="../termos/" target="_blank">Termos de Uso</a> e a <a href="../privacidade/" target="_blank">Política de Privacidade</a>. Minha empresa atende todos os clientes, não vai publicar conteúdo político, de candidatos, partidos, palavrões ou ataques a pessoas, e é a única responsável por tudo o que publicar no Lado.</span></label>
       <p class="spam">Registramos data, hora e navegador desta autorização.</p>
     </div>
@@ -352,6 +352,16 @@ async function abrirPainel() {
       `Plano atual: <strong>${NOME[e.plano]}</strong>` + (e.plano !== 'gratis' && e.plano_ate ? ` · vale até <strong>${dataBR(e.plano_ate)}</strong>` : '') +
       (emTeste ? ` · com teste grátis do Destaque até <strong>${dataBR(e.teste_destaque_ate)}</strong>` : '');
   $('blocoPlanos').classList.toggle('oculto', e.status !== 'publicada');
+  if (e.status === 'publicada') {
+    $('pPlano').insertAdjacentHTML('beforeend', '<br><button class="link" id="btnTirarMapa" type="button" style="margin:8px 0 0;padding:0">Tirar minha empresa do mapa</button>');
+    $('btnTirarMapa').onclick = async () => {
+      if (!confirm('Tirar sua empresa do mapa?\n\nO perfil e a declaração deixam de aparecer na hora para os clientes. Nada é apagado: plano, fotos, publicações e estatísticas ficam guardados e você volta ao mapa quando quiser.\n\nAtenção: se tiver assinatura no cartão, ela continua renovando. Para parar as cobranças, use "Cancelar renovação" (mais abaixo).')) return;
+      const { error } = await sb.rpc('tirar_do_mapa');
+      if (error) { msg('msgPainel', 'erro', 'Não foi possível tirar do mapa agora. Tente de novo ou fale com a equipe.'); return; }
+      const { data } = await sb.rpc('minha_empresa'); if (data && data[0]) empresa = data[0];
+      await abrirPainel(); msg('msgPainel', 'ok', 'Sua empresa saiu do mapa. Para voltar, use o botão "Voltar ao mapa".');
+    };
+  }
   const bv = document.getElementById('btnVoltarMapa');
   if (bv) bv.onclick = async () => {
     bv.disabled = true;
@@ -752,7 +762,7 @@ $('btnAvancar').onclick = async () => {
       latitude: cad.lat, longitude: cad.lng, lado: cad.lado,
     }).select('id').single();
     if (error) throw new Error(/duplicate|unique/i.test(error.message) ? 'Este CNPJ já está cadastrado no Lado. Se não foi você, use "Não reconheço este cadastro" no rodapé do site.' : 'Não foi possível enviar agora. Tente de novo em instantes.');
-    const { error: e2 } = await sb.from('consentimentos').insert({ empresa_id: emp.id, usuario_id: u.user.id, lado: cad.lado, versao_termos: 'v2-2026-10-30',
+    const { error: e2 } = await sb.from('consentimentos').insert({ empresa_id: emp.id, usuario_id: u.user.id, lado: cad.lado, versao_termos: 'v3-2026-11-02',
       aceitou_exibir: true, aceitou_remover: true, aceitou_termos: true, aparelho: ('Site · ' + navigator.userAgent).slice(0, 200) });
     if (e2) throw new Error('Não foi possível registrar a autorização. Tente de novo.');
     await iniciar();
