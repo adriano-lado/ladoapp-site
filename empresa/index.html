@@ -406,11 +406,23 @@ async function carregarAssinatura() {
   if (!a) { b.classList.add('oculto'); return; }
   b.classList.remove('oculto');
   b.innerHTML = `<h2>Assinatura no cartão</h2><p class="sub" style="margin:0">Plano <strong>${NOME[a.plano]}</strong> · ${a.status === 'authorized' ? 'ativa, renova sozinha todo mês' : a.status === 'paused' ? 'pausada pelo Mercado Pago' : 'aguardando confirmação do cartão'}.</p>
-    <button class="botao claro" id="btnCancelar" type="button">Cancelar renovação</button><div id="msgAss"></div>`;
-  $('btnCancelar').onclick = async () => {
-    if (!confirm('Cancelar a renovação automática? O plano continua até o fim do período já pago e depois volta ao Grátis.')) return;
-    const r = await chamarPlanos({ acao: 'cancelar', empresa_id: empresa.id });
-    if (r.erro) { msg('msgAss', 'erro', r.erro); return; }
+    <button class="botao claro" id="btnCancelar" type="button">Cancelar renovação</button>
+    <div id="caixaCancelar" class="oculto" style="margin-top:12px">
+      <div class="msg erro"><strong>Atenção:</strong> ao cancelar, a renovação para agora e não haverá novas cobranças. Sua empresa continua com o plano <strong>${NOME[a.plano]}</strong> só até ${empresa.plano_ate ? '<strong>' + dataBR(empresa.plano_ate) + '</strong>' : 'o fim do período já pago'}. Depois disso você <strong>perde os recursos do plano</strong> (contorno, destaque no mapa, fotos e publicações extras) e a empresa volta ao Grátis.</div>
+      <label style="display:grid;gap:6px;font-weight:600;margin-top:10px">Digite sua senha para confirmar
+        <input id="senhaCancelar" type="password" autocomplete="current-password" style="font:inherit;padding:12px;border-radius:10px;border:1.5px solid var(--borda)">
+      </label>
+      <button class="botao" id="btnConfirmarCancelar" type="button">Confirmar cancelamento</button>
+    </div>
+    <div id="msgAss"></div>`;
+  $('btnCancelar').onclick = () => { $('caixaCancelar').classList.remove('oculto'); $('btnCancelar').classList.add('oculto'); $('senhaCancelar').focus(); };
+  $('btnConfirmarCancelar').onclick = async () => {
+    const senha = $('senhaCancelar').value;
+    if (!senha) { msg('msgAss', 'erro', 'Digite sua senha para confirmar o cancelamento.'); return; }
+    $('btnConfirmarCancelar').disabled = true;
+    const r = await chamarPlanos({ acao: 'cancelar', empresa_id: empresa.id, senha });
+    $('senhaCancelar').value = '';
+    if (r.erro) { $('btnConfirmarCancelar').disabled = false; msg('msgAss', 'erro', r.erro); return; }
     msg('msgAss', 'ok', 'Renovação cancelada. Não haverá novas cobranças.'); setTimeout(carregarAssinatura, 1500);
   };
 }
@@ -444,6 +456,7 @@ const ERROS = {
   PRAZO: 'O prazo de 7 dias para reembolso deste pagamento já passou.',
   SEM_PAGAMENTO: 'Este pagamento não pode ser reembolsado.',
   MANUAL: 'Este pagamento precisa ser reembolsado pela equipe. Fale com a gente no WhatsApp (27) 99265-0771.',
+  SENHA: 'Senha incorreta. Confira e tente de novo (ou use "Esqueci a senha" na tela de entrada).',
   CUPOM: 'Este cupom não vale mais (expirou ou já foi usado). Gere o Pix de novo pelo preço normal.',
   CARTAO: 'O cartão não foi aprovado. Confira os dados ou tente outro cartão (ou pague com Pix).',
 };
