@@ -25,6 +25,8 @@
 .ae label{display:block;font-weight:600;font-size:14px;margin:12px 0 6px}
 .ae input,.ae select{width:100%;font:inherit;font-size:16px;padding:12px 14px;border-radius:12px;border:1px solid var(--borda);background:var(--fundo);color:var(--texto)}
 .ae .linha{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ae .selos{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
+.ae .selos span{font-size:13px;font-weight:600;border:1px solid var(--borda);border-radius:999px;padding:6px 11px;background:var(--fundo);color:var(--texto)}
 .ae .linha>*{flex:1 1 180px}
 .ae .botao{margin-top:14px}
 .ae .botao.claro{background:var(--fundo);color:var(--texto);border:1px solid var(--borda)}
@@ -197,6 +199,7 @@
           <button class="botao" data-plano="destaque" data-mod="pix" type="button">Pagar com Pix · 30 dias</button>
           <button class="botao claro" data-plano="destaque" data-mod="cartao" type="button">Assinar no cartão · mensal</button></div>
       </div>
+      <div class="selos" aria-label="Segurança do pagamento"><span>🔒 Pagamento seguro</span><span>⚡ Pix na hora</span><span>💳 Cartão de crédito</span><span>🛡️ Processado pelo Mercado Pago</span><span>↩️ Reembolso em até 7 dias</span></div>
       <p class="spam">Pagamento seguro processado pelo Mercado Pago, aqui mesmo na página. Na fatura ou no extrato aparece "LADO". Se já tiver dias pagos do mesmo plano, os novos 30 dias são somados.</p>
       <div id="msgPlanos"></div>
       <div id="caixaPag" class="oculto" style="margin-top:16px;border:2px solid var(--grafite);border-radius:16px;padding:18px">
@@ -212,6 +215,7 @@
           <p class="sub" style="margin:8px 0">Assinatura mensal no cartão de crédito. Renova sozinha todo mês e você cancela quando quiser aqui na Área da empresa. Os dados do cartão vão direto para o Mercado Pago, com segurança; o Lado não vê nem guarda o cartão.</p>
           <div id="cardBrick"></div>
         </div>
+        <div class="selos" aria-label="Segurança do pagamento"><span>🔒 Pagamento seguro</span><span>⚡ Pix na hora</span><span>💳 Cartão de crédito</span><span>🛡️ Processado pelo Mercado Pago</span><span>↩️ Reembolso em até 7 dias</span></div>
         <div id="msgPag"></div>
       </div>
     </div>
@@ -781,6 +785,7 @@ iniciar().then(() => { if (empresa && empresa.status !== 'pendente') conferirRet
     <a class="marca pequena" href="../" aria-label="Lado, página inicial"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><clipPath id="pl"><rect width="50" height="100"/></clipPath><clipPath id="pr"><rect x="50" width="50" height="100"/></clipPath></defs><path clip-path="url(#pl)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#E2483D"/><path clip-path="url(#pr)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#2F66D8"/><circle cx="50" cy="37" r="12" fill="#fff"/></svg><span>lado</span></a>
     <span>Dois lados, um mapa.</span>
     <span>© 2026 Lado · CNPJ 51.316.465/0001-97</span>
+    <span>🔒 Site seguro (HTTPS) · 🛡️ Pagamentos pelo Mercado Pago · ↩️ Reembolso em até 7 dias</span>
   </div>
   <nav class="col" aria-label="Políticas">
     <strong>Políticas</strong>
