@@ -45,6 +45,23 @@ details p{margin:8px 0 0;color:var(--texto2)}
 .rodape .marca.pequena{font-size:18px}
 .rodape .marca.pequena svg{width:22px;height:22px}
 .ok{color:var(--verde);font-weight:700}
+/* ---- Carrossel de telas ---- */
+.telas{margin-top:40px}
+.telas .cab{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.telas h2{font-family:"Familjen Grotesk",sans-serif;font-size:30px;margin:0;letter-spacing:-.5px}
+.telas .cab p{margin:4px 0 0;color:var(--texto2)}
+.setas{display:flex;gap:8px}
+.setas button{width:44px;height:44px;border-radius:50%;border:1px solid var(--borda);background:var(--sup);color:var(--texto);font-size:20px;cursor:pointer;line-height:1}
+.setas button:disabled{opacity:.35;cursor:default}
+.trilho{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:18px 2px 8px;margin:0 -2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.trilho::-webkit-scrollbar{display:none}
+.trilho figure{flex:0 0 calc((100% - 32px)/3);margin:0;scroll-snap-align:start}
+.trilho img{width:100%;height:auto;aspect-ratio:9/16;display:block;border-radius:22px;border:1px solid var(--borda);background:#1B2228}
+@media (max-width:760px){.trilho figure{flex-basis:72%}.setas{display:none}}
+.pontos{display:flex;justify-content:center;gap:8px;margin-top:8px}
+.pontos button{width:9px;height:9px;padding:0;border-radius:50%;border:0;background:var(--borda);cursor:pointer}
+.pontos button[aria-current="true"]{background:var(--texto);width:22px;border-radius:6px}
+.telas .nota{margin:8px 0 0;text-align:center;color:var(--texto2);font-size:13px}
 /* ---- Como usar ---- */
 .guia-topo{display:grid;gap:10px;padding:40px 0 8px}
 .guia-topo h1{font-family:"Familjen Grotesk",sans-serif;font-size:clamp(34px,6vw,54px);line-height:1.05;margin:0;letter-spacing:-1.5px}
