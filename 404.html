@@ -8,11 +8,16 @@
 <meta name="theme-color" content="#1B2228">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/estilo.css">
+<script>/* Modo app: páginas abertas pelo app (?app=1) não mostram planos, preços nem links de compra. */
+(function(){var d=document.documentElement,on=/[?&]app=1(&|$)/.test(location.search);
+try{if(on)sessionStorage.setItem('ladoApp','1');on=on||sessionStorage.getItem('ladoApp')==='1';}catch(e){}
+if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.pathname))d.classList.add('app-bloq');}})();</script>
+<style>.modo-app .so-site{display:none!important}.app-bloq main>*{display:none!important}.app-bloq main::before{content:"Esta página não está disponível no app.";display:block;padding:64px 20px;text-align:center;font-size:18px}</style>
 </head>
 <body>
 <header class="topo">
   <a class="marca" href="/" aria-label="Lado, página inicial"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><clipPath id="pl"><rect width="50" height="100"/></clipPath><clipPath id="pr"><rect x="50" width="50" height="100"/></clipPath></defs><path clip-path="url(#pl)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#E2483D"/><path clip-path="url(#pr)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#2F66D8"/><circle cx="50" cy="37" r="12" fill="#fff"/></svg><span>lado</span></a>
-  <nav aria-label="Menu"><a href="/como-usar/">Como usar</a><a href="/#como-funciona">Como funciona</a><a href="/#empresas">Para empresas</a><a href="/suporte/">Suporte</a></nav>
+  <nav aria-label="Menu"><a href="/como-usar/">Como usar</a><a href="/#como-funciona">Como funciona</a><a class="so-site" href="/#empresas">Para empresas</a><a href="/suporte/">Suporte</a></nav>
 </header>
 <main>
 <article class="doc"><h1>Página não encontrada</h1><p>Volte para a <a href="/">página inicial do Lado</a>.</p></article>
