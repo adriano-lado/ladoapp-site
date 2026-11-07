@@ -179,6 +179,15 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
       <div id="msgPainel"></div>
     </div>
 
+    <div class="bloco oculto" id="blocoQR">
+      <h2>QR code da sua empresa</h2>
+      <p class="sub" style="margin:0">Cole na vitrine, no balcão ou no cardápio. O cliente aponta a câmera do celular e abre o perfil da sua empresa no app Lado.</p>
+      <div style="text-align:center;margin:14px 0"><canvas id="qrCartaz" width="1240" height="1754" style="width:100%;max-width:300px;border:1px solid var(--borda);border-radius:12px;background:#fff" role="img" aria-label="Cartaz com o QR code da sua empresa"></canvas></div>
+      <button class="botao" id="btnBaixarCartaz" type="button">Baixar cartaz para imprimir (A4)</button>
+      <button class="botao claro" id="btnBaixarQR" type="button">Baixar só o QR code</button>
+      <p class="spam">O cartaz não mostra o lado da empresa: quem ler o QR code vê o perfil completo no app. Link do QR code: <a id="qrLink" target="_blank" rel="noopener"></a></p>
+    </div>
+
     <div class="bloco oculto" id="blocoOferta"></div>
 
     <div class="bloco">
@@ -242,6 +251,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="../qr.js?v=1"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (() => {
@@ -379,8 +389,45 @@ async function abrirPainel() {
     const { data } = await sb.rpc('minha_empresa'); if (data && data[0]) empresa = data[0];
     await abrirPainel(); msg('msgPainel', 'ok', 'Sua empresa voltou ao mapa ✓ O perfil já aparece de novo para os clientes.');
   };
-  await Promise.all([carregarOferta(), carregarEstatisticas(), carregarAssinatura(), carregarPagamentos()]);
+  await Promise.all([carregarOferta(), carregarEstatisticas(), carregarAssinatura(), carregarPagamentos(), carregarQR()]);
 }
+/* ---------------- QR code da empresa ---------------- */
+function desenharQR(ctx, link, x, y, tam) {
+  const m = window.LadoQR(link), n = m.length, q = 4, cel = tam / (n + 2 * q);
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(x, y, tam, tam); ctx.fillStyle = '#1B2228';
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (m[r][c]) ctx.fillRect(Math.floor(x + (c + q) * cel), Math.floor(y + (r + q) * cel), Math.ceil(cel), Math.ceil(cel));
+}
+function textoQueCabe(ctx, txt, peso, max, largura) {
+  let t = max; do { ctx.font = `${peso} ${t}px Figtree, Arial, sans-serif`; t -= 2; } while (ctx.measureText(txt).width > largura && t > 24);
+}
+function baixarCanvas(cv, nome) {
+  cv.toBlob((b) => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = nome; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); }, 'image/png');
+}
+async function carregarQR() {
+  const b = $('blocoQR');
+  if (empresa.status !== 'publicada' || !window.LadoQR) { b.classList.add('oculto'); return; }
+  b.classList.remove('oculto');
+  const link = 'https://ladoapp.com.br/e/?id=' + empresa.id;
+  $('qrLink').href = link; $('qrLink').textContent = link.replace('https://', '');
+  const slug = (empresa.nome_fantasia || 'empresa').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'empresa';
+  try { await document.fonts.ready; } catch (e) {}
+  const logo = await new Promise((ok) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = '../logo.png'; });
+  const cv = $('qrCartaz'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#E2483D'; ctx.fillRect(0, 0, W / 2, 28); ctx.fillStyle = '#2F66D8'; ctx.fillRect(W / 2, 0, W / 2, 28);
+  ctx.fillStyle = '#E2483D'; ctx.fillRect(0, H - 28, W / 2, 28); ctx.fillStyle = '#2F66D8'; ctx.fillRect(W / 2, H - 28, W / 2, 28);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  if (logo) ctx.drawImage(logo, W / 2 - 190, 110, 120, 120);
+  ctx.fillStyle = '#1B2228'; ctx.font = '700 104px "Familjen Grotesk", Figtree, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.fillText('lado', W / 2 - 50, 205); ctx.textAlign = 'center';
+  ctx.font = '700 92px "Familjen Grotesk", Figtree, Arial, sans-serif'; ctx.fillText('Estamos no Lado', W / 2, 400);
+  ctx.fillStyle = '#4A5560'; ctx.font = '400 44px Figtree, Arial, sans-serif'; ctx.fillText('Aponte a câmera do celular e veja nossas', W / 2, 480); ctx.fillText('ofertas, fotos e novidades.', W / 2, 536);
+  const tam = 780; desenharQR(ctx, link, (W - tam) / 2, 600, tam);
+  ctx.fillStyle = '#1B2228'; textoQueCabe(ctx, empresa.nome_fantasia || '', 700, 64, W - 160); ctx.fillText(empresa.nome_fantasia || '', W / 2, 1480);
+  ctx.fillStyle = '#4A5560'; ctx.font = '400 38px Figtree, Arial, sans-serif'; ctx.fillText('App grátis na App Store · ladoapp.com.br', W / 2, 1580);
+  $('btnBaixarCartaz').onclick = () => baixarCanvas(cv, `lado-cartaz-${slug}.png`);
+  $('btnBaixarQR').onclick = () => { const c = document.createElement('canvas'); c.width = c.height = 1000; desenharQR(c.getContext('2d'), link, 0, 0, 1000); baixarCanvas(c, `lado-qrcode-${slug}.png`); };
+}
+
 
 async function carregarOferta() {
   const b = $('blocoOferta');
