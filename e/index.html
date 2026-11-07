@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lado · Empresa no mapa</title>
+<meta name="description" content="Veja esta empresa no app Lado.">
+<meta name="theme-color" content="#1B2228">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../estilo.css">
+<script>/* Modo app: páginas abertas pelo app (?app=1) não mostram planos, preços nem links de compra. */
+(function(){var d=document.documentElement,on=/[?&]app=1(&|$)/.test(location.search);
+try{if(on)sessionStorage.setItem('ladoApp','1');on=on||sessionStorage.getItem('ladoApp')==='1';}catch(e){}
+if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.pathname))d.classList.add('app-bloq');}})();</script>
+<style>.modo-app .so-site{display:none!important}.app-bloq main>*{display:none!important}.app-bloq main::before{content:"Esta página não está disponível no app.";display:block;padding:64px 20px;text-align:center;font-size:18px}</style>
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="../" aria-label="Lado, página inicial"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><clipPath id="pl"><rect width="50" height="100"/></clipPath><clipPath id="pr"><rect x="50" width="50" height="100"/></clipPath></defs><path clip-path="url(#pl)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#E2483D"/><path clip-path="url(#pr)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#2F66D8"/><circle cx="50" cy="37" r="12" fill="#fff"/></svg><span>lado</span></a>
+  <nav aria-label="Menu"><a href="../como-usar/">Como usar</a><a href="../#como-funciona">Como funciona</a><a class="so-site" href="../#empresas">Para empresas</a><a href="../suporte/">Suporte</a></nav>
+</header>
+<main>
+
+<article class="doc" style="text-align:center;max-width:560px;margin:32px auto">
+  <div id="eCarregando"><p class="sub">Carregando a empresa…</p></div>
+  <div id="eAchou" hidden>
+    <p class="spam" style="letter-spacing:2px;text-transform:uppercase;font-weight:700;margin:0">Empresa no mapa do Lado</p>
+    <h1 id="eNome" style="margin:8px 0 4px"></h1>
+    <p class="sub" id="eLocal" style="margin:0 0 10px"></p>
+    <p style="margin:0 0 18px"><span id="eLado" style="display:inline-block;color:#fff;font-weight:700;border-radius:999px;padding:4px 14px;font-size:14px"></span></p>
+    <a class="botao" id="eAbrir" href="#">Abrir no app Lado</a>
+    <div id="eLoja" style="margin-top:22px">
+      <p class="sub" style="margin:0 0 8px">Ainda não tem o app? É grátis.</p>
+      <a class="botao claro" href="https://apps.apple.com/br/app/lado-empresas-no-mapa/id6831672111" target="_blank" rel="noopener" id="eApple">Baixar na App Store</a>
+      <p class="spam" id="eAndroid" style="margin:10px 0 0">No Android, o Lado chega em breve à Google Play.</p>
+    </div>
+  </div>
+  <div id="eNada" hidden>
+    <h1>Empresa fora do mapa</h1>
+    <p class="sub">Esta empresa não está no mapa do Lado agora. Veja outras empresas perto de você no app.</p>
+    <a class="botao" href="https://apps.apple.com/br/app/lado-empresas-no-mapa/id6831672111" target="_blank" rel="noopener">Baixar na App Store</a>
+    <p class="spam"><a href="/">Conhecer o Lado</a></p>
+  </div>
+</article>
+<script>
+(async function(){
+  var id=(new URLSearchParams(location.search).get('id')||'').toLowerCase();
+  var ok=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(id), e=null;
+  if(ok){try{var r=await fetch('https://oxhedfbrgdaxbwkjtwiz.supabase.co/rest/v1/empresas?select=nome_fantasia,categoria,bairro,cidade,uf,lado&status=eq.publicada&id=eq.'+id,{headers:{apikey:'sb_publishable_3HAUdFwaNBw8sEsGrVPtkw_OdzNtd15'}});var d=await r.json();e=Array.isArray(d)&&d[0];}catch(x){}}
+  document.getElementById('eCarregando').hidden=true;
+  if(!e){document.getElementById('eNada').hidden=false;return;}
+  document.getElementById('eAchou').hidden=false;
+  document.title=e.nome_fantasia+' · Lado';
+  document.getElementById('eNome').textContent=e.nome_fantasia;
+  document.getElementById('eLocal').textContent=[e.categoria,e.bairro,e.cidade&&(e.cidade+(e.uf?' – '+e.uf:''))].filter(Boolean).join(' · ');
+  var l=document.getElementById('eLado');l.textContent=e.lado==='esquerda'?'Esquerda':'Direita';l.style.background=e.lado==='esquerda'?'#C93A30':'#2556BE';
+  document.getElementById('eAbrir').href='lado://empresa/'+id;
+  var ua=navigator.userAgent, ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&'ontouchend' in document), andr=/Android/.test(ua);
+  if(ios)document.getElementById('eAndroid').hidden=true;
+  if(andr)document.getElementById('eApple').hidden=true;
+})();
+</script>
+
+</main>
+<footer class="rodape"><div class="in">
+  <div class="col">
+    <a class="marca pequena" href="../" aria-label="Lado, página inicial"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><clipPath id="pl"><rect width="50" height="100"/></clipPath><clipPath id="pr"><rect x="50" width="50" height="100"/></clipPath></defs><path clip-path="url(#pl)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#E2483D"/><path clip-path="url(#pr)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#2F66D8"/><circle cx="50" cy="37" r="12" fill="#fff"/></svg><span>lado</span></a>
+    <span>Dois lados, um mapa.</span>
+    <span>© 2026 Lado · CNPJ 51.316.465/0001-97</span>
+  </div>
+  <nav class="col" aria-label="Políticas">
+    <strong>Políticas</strong>
+    <a href="../termos/">Termos de uso</a>
+    <a href="../privacidade/">Política de privacidade</a>
+    <a href="../nao-reconheco/">Não reconheço um cadastro</a>
+    <a href="../excluir-conta/">Excluir minha conta</a>
+  </nav>
+  <nav class="col" aria-label="Contato">
+    <strong>Contato</strong>
+    <a href="https://wa.me/5527992650771?text=Ol%C3%A1!%20Preciso%20de%20ajuda%20com%20o%20app%20Lado." target="_blank" rel="noopener">WhatsApp (27) 99265-0771</a>
+    <a href="https://www.instagram.com/useladoapp/" target="_blank" rel="noopener"><img src="/instagram.png" width="18" height="18" alt="" style="vertical-align:-4px;margin-right:6px">Instagram @useladoapp</a>
+    <a href="mailto:contato@ladoapp.com.br">contato@ladoapp.com.br</a>
+    <a href="../suporte/">Central de suporte</a>
+  </nav>
+</div></footer>
+</body>
+</html>
