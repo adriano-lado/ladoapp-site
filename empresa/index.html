@@ -182,6 +182,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
     <div class="bloco oculto" id="blocoQR">
       <h2>QR code da sua empresa</h2>
       <p class="sub" style="margin:0">Cole na vitrine, no balcão ou no cardápio. O cliente aponta a câmera do celular e abre o perfil da sua empresa no app Lado.</p>
+      <div id="qrAviso" class="msg info oculto" style="margin-top:12px">Sua empresa está fora do mapa agora. Você já pode baixar e imprimir o cartaz, mas quem ler o QR code vai ver "Empresa fora do mapa" até você voltar ao mapa.</div>
       <div style="text-align:center;margin:14px 0"><canvas id="qrCartaz" width="1240" height="1754" style="width:100%;max-width:300px;border:1px solid var(--borda);border-radius:12px;background:#fff" role="img" aria-label="Cartaz com o QR code da sua empresa"></canvas></div>
       <button class="botao" id="btnBaixarCartaz" type="button">Baixar cartaz para imprimir (A4)</button>
       <button class="botao claro" id="btnBaixarQR" type="button">Baixar só o QR code</button>
@@ -405,8 +406,9 @@ function baixarCanvas(cv, nome) {
 }
 async function carregarQR() {
   const b = $('blocoQR');
-  if (empresa.status !== 'publicada' || !window.LadoQR) { b.classList.add('oculto'); return; }
+  if (!['publicada', 'oculta'].includes(empresa.status) || !window.LadoQR) { b.classList.add('oculto'); return; }
   b.classList.remove('oculto');
+  $('qrAviso').classList.toggle('oculto', empresa.status !== 'oculta');
   const link = 'https://ladoapp.com.br/e/?id=' + empresa.id;
   $('qrLink').href = link; $('qrLink').textContent = link.replace('https://', '');
   const slug = (empresa.nome_fantasia || 'empresa').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'empresa';
