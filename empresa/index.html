@@ -51,7 +51,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
 .ae .preco{font-family:"Familjen Grotesk",sans-serif;font-size:28px;font-weight:700}
 .ae .preco small{font-size:14px;color:var(--texto2);font-weight:600}
 .ae .plano ul{margin:4px 0 8px;padding-left:18px;color:var(--texto2);font-size:14px}
-.ae .num{display:block;font-family:"Familjen Grotesk",sans-serif;font-size:30px;font-weight:700}
+.ae .numq{display:block;font-family:"Familjen Grotesk",sans-serif;font-size:30px;font-weight:700}
 .ae .quadros{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .ae .quadro{border:1px solid var(--borda);border-radius:14px;padding:12px;font-size:14px;color:var(--texto2)}
 .ae .barras{display:flex;align-items:flex-end;gap:10px;height:110px;margin-top:10px}
@@ -461,7 +461,7 @@ async function carregarEstatisticas() {
   const { data } = await sb.rpc('minhas_estatisticas');
   const d = data || []; const at = d[0] || { perfil: 0, cupom: 0, whatsapp: 0, rota: 0 }; const ant = d[1];
   $('quadros').innerHTML = [[at.perfil,'pessoas abriram seu card'],[at.cupom,'pegaram cupom'],[at.whatsapp,'chamaram no WhatsApp'],[at.rota,'pediram rota']]
-    .map(([n,t]) => `<div class="quadro"><span class="num">${n}</span>${t}</div>`).join('');
+    .map(([n,t]) => `<div class="quadro"><span class="numq">${n}</span>${t}</div>`).join('');
   $('variacao').textContent = ant && ant.perfil > 0 ? `${at.perfil >= ant.perfil ? '▲' : '▼'} ${Math.abs(Math.round((at.perfil - ant.perfil) / ant.perfil * 100))}% de aberturas do card em relação ao mês passado.` : '';
   const maior = Math.max(1, ...d.map(x => x.perfil));
   $('barras').innerHTML = [...d].reverse().map((x, i, arr) => `<div>${x.perfil}<i class="${i === arr.length - 1 ? 'atual' : ''}" style="height:${Math.max(4, x.perfil / maior * 70)}px"></i>${MESES[new Date(x.mes + 'T12:00:00').getMonth()]}</div>`).join('');
