@@ -28,7 +28,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
 
 <h2>1. Resumo</h2>
 <ul>
-<li><strong>Quem compra não tem conta.</strong> O filtro (esquerda/direita), a busca e a sua localização ficam só no seu celular. Não são enviados nem guardados pelo Lado.</li>
+<li><strong>Quem compra não tem conta.</strong> O filtro (esquerda/direita) fica só no seu celular. O texto da busca e a área do mapa que você está vendo são enviados só para encontrar as empresas e não são guardados pelo Lado. Sua localização exata não sai do celular.</li>
 <li><strong>Empresas</strong> têm conta. Guardamos o necessário para exibir o perfil, verificar o cadastro, cobrar planos e cumprir a lei.</li>
 <li>O lado de cada empresa é público <strong>por decisão da própria empresa</strong>, com consentimento específico, e pode ser retirado a qualquer momento.</li>
 <li>Não vendemos dados. Não fazemos anúncios. Não compartilhamos dados com partidos, campanhas ou para fins políticos.</li>
@@ -39,8 +39,8 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
 
 <h2>3. Dados de quem só usa o mapa</h2>
 <ul>
-<li><strong>Localização:</strong> usada só no próprio celular, com a sua permissão, para centralizar o mapa e calcular distâncias. Não é enviada ao Lado. Sem permissão, o mapa funciona normalmente.</li>
-<li><strong>Filtro e busca:</strong> processados no celular e no momento da consulta. Não guardamos o que você buscou nem o lado que filtrou.</li>
+<li><strong>Localização:</strong> com a sua permissão, usada no celular para centralizar o mapa e calcular distâncias. Sua posição exata não é enviada ao Lado. Para mostrar as empresas, o app envia a área do mapa que está na tela e, para a oferta de lançamento, o nome da sua cidade. Nada disso é guardado nem ligado a você. Sem permissão, o mapa funciona normalmente.</li>
+<li><strong>Filtro e busca:</strong> o filtro de lado é processado só no celular. O texto da busca é enviado no momento da consulta e não é guardado pelo Lado. Os registros técnicos do servidor (Supabase) podem manter os pedidos por poucos dias, só para segurança e correção de falhas.</li>
 <li><strong>Estatísticas para as empresas:</strong> contamos quantas vezes cada perfil foi aberto e quantos toques houve em rota, WhatsApp e cupom, <strong>sem guardar nada que identifique quem tocou</strong> (nem conta, nem aparelho, nem localização).</li>
 <li><strong>Denúncias:</strong> podem ser enviadas sem identificação. Guardamos só o perfil denunciado, o motivo e o texto que você escrever.</li>
 <li>Ao tocar em "Como chegar", "WhatsApp" ou "Avaliar no Google", você sai do Lado e passa a usar o app correspondente, com as regras de privacidade dele.</li>
