@@ -131,5 +131,33 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
     <a href="./suporte/">Central de suporte</a>
   </nav>
 </div></footer>
+<div id="ckBanner" class="ck" hidden role="dialog" aria-label="Aviso de cookies">
+  <p>Usamos cookies da Meta (Facebook e Instagram) para medir nossos anúncios. Nenhum dado sobre esquerda ou direita é enviado. <a href="/privacidade/#cookies">Saiba mais</a></p>
+  <div><button type="button" id="ckNao">Recusar</button><button type="button" id="ckSim">Aceitar</button></div>
+</div>
+<style>.ck{position:fixed;left:12px;right:12px;bottom:12px;z-index:50;max-width:560px;margin:0 auto;background:#1B2228;color:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 8px 30px rgba(0,0,0,.25);font-size:14px;line-height:20px}.ck p{margin:0 0 10px}.ck a{color:#fff}.ck div{display:flex;gap:8px;justify-content:flex-end}.ck button{border:0;border-radius:10px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer}#ckNao{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4)}#ckSim{background:#fff;color:#1B2228}.ck[hidden]{display:none}</style>
+<script>(function(){
+var ID='1447078484261423';
+if(document.documentElement.classList.contains('modo-app'))return;
+function ler(){try{return localStorage.getItem('ladoCookies')}catch(e){return null}}
+function gravar(v){try{localStorage.setItem('ladoCookies',v)}catch(e){}}
+function carregar(){
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('set','autoConfig',false,ID);
+  fbq('init',ID);
+  fbq('track','PageView');
+  var visto=false,sec=document.getElementById('empresas');
+  if(sec&&'IntersectionObserver' in window){var o=new IntersectionObserver(function(es){if(!visto&&es[0].isIntersecting){visto=true;fbq('track','ViewContent',{content_name:'Para empresas'});o.disconnect();}},{threshold:0.3});o.observe(sec);}
+  document.addEventListener('click',function(ev){var a=ev.target.closest&&ev.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href')||'';
+    if(/(^|\/)empresa\/?(#|$)/.test(h))fbq('track','Lead',{content_name:'Cadastro empresa'});
+    else if(/apps\.apple\.com|play\.google\.com/.test(h))fbq('track','Lead',{content_name:'Baixar app'});},true);
+}
+var c=ler();
+if(c==='sim'){carregar();return;}
+if(c==='nao')return;
+var b=document.getElementById('ckBanner');b.hidden=false;
+document.getElementById('ckSim').onclick=function(){gravar('sim');b.hidden=true;carregar();};
+document.getElementById('ckNao').onclick=function(){gravar('nao');b.hidden=true;};
+})();</script>
 </body>
 </html>
