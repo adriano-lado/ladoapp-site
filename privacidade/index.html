@@ -7,7 +7,7 @@
 <meta name="description" content="Como o Lado trata seus dados (LGPD).">
 <meta name="theme-color" content="#1B2228">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../estilo.css">
+<link rel="stylesheet" href="../estilo.css?v=20261103j">
 <script>/* Modo app: páginas abertas pelo app (?app=1) não mostram planos, preços nem links de compra. */
 (function(){var d=document.documentElement,on=/[?&]app=1(&|$)/.test(location.search);
 try{if(on)sessionStorage.setItem('ladoApp','1');on=on||sessionStorage.getItem('ladoApp')==='1';}catch(e){}
@@ -22,13 +22,13 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
 <main>
 
 <article class="doc">
-<p class="meta">Versão v4-2026-11-09 · em vigor desde 9 de novembro de 2026</p>
+<p class="meta">Versão v5-2026-11-10 · em vigor desde 10 de novembro de 2026</p>
 <h1>Política de privacidade</h1>
 <p>Esta política explica quais dados o app Lado e o site ladoapp.com.br tratam, por quê, com quem compartilham, por quanto tempo guardam e como você exerce os seus direitos, conforme a Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018) e o Marco Civil da Internet (Lei 12.965/2014).</p>
 
 <h2>1. Resumo</h2>
 <ul>
-<li><strong>Quem compra não tem conta.</strong> O filtro (esquerda/direita) fica só no seu celular. O texto da busca e a área do mapa que você está vendo são enviados só para encontrar as empresas e não são guardados pelo Lado. Sua localização exata não sai do celular.</li>
+<li><strong>Quem compra não tem conta.</strong> O filtro (neutro, esquerda ou direita), as empresas que você segue e o que você curtiu ficam só no seu celular. O texto da busca e a área do mapa que você está vendo são enviados só para encontrar as empresas e não são guardados pelo Lado. Sua localização exata não sai do celular.</li>
 <li><strong>Empresas</strong> têm conta. Guardamos o necessário para exibir o perfil, verificar o cadastro, cobrar planos e cumprir a lei.</li>
 <li>O lado de cada empresa é público <strong>por decisão da própria empresa</strong>, com consentimento específico, e pode ser retirado a qualquer momento.</li>
 <li>Não vendemos dados. O app não exibe anúncios e não tem rastreamento. Não compartilhamos dados com partidos, campanhas ou para fins políticos.</li>
@@ -40,9 +40,11 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
 
 <h2>3. Dados de quem só usa o mapa</h2>
 <ul>
-<li><strong>Localização:</strong> com a sua permissão, usada no celular para centralizar o mapa e calcular distâncias. Sua posição exata não é enviada ao Lado. Para mostrar as empresas, o app envia a área do mapa que está na tela e, para a oferta de lançamento, o nome da sua cidade. Nada disso é guardado nem ligado a você. Sem permissão, o mapa funciona normalmente.</li>
+<li><strong>Localização:</strong> com a sua permissão, usada no celular para centralizar o mapa e calcular distâncias. Sua posição exata não é enviada ao Lado. Para mostrar as empresas, o app envia a área do mapa que está na tela. Isso não é guardado nem ligado a você. O aviso de oferta de quem você segue é calculado no próprio celular. Sem permissão, o mapa funciona normalmente.</li>
 <li><strong>Filtro e busca:</strong> o filtro de lado é processado só no celular. O texto da busca é enviado no momento da consulta e não é guardado pelo Lado. Os registros técnicos do servidor (Supabase) podem manter os pedidos por poucos dias, só para segurança e correção de falhas.</li>
-<li><strong>Estatísticas para as empresas:</strong> contamos quantas vezes cada perfil foi aberto e quantos toques houve em rota, WhatsApp e cupom, <strong>sem guardar nada que identifique quem tocou</strong> (nem conta, nem aparelho, nem localização).</li>
+<li><strong>Estatísticas para as empresas:</strong> contamos quantas vezes cada empresa apareceu no mapa ou na lista, quantas vezes o perfil foi aberto e quantos toques houve em rota, WhatsApp, redes sociais e cupom, <strong>sem guardar nada que identifique quem viu ou tocou</strong> (nem conta, nem aparelho, nem localização).</li>
+<li><strong>Seguir e curtir:</strong> o servidor guarda só o total de seguidores de cada empresa e o total de curtidas de cada publicação ou oferta. A lista do que você segue e curtiu fica só no seu celular e some se você apagar o app.</li>
+<li><strong>Cupons:</strong> ao pegar um cupom, o app recebe um código curto só seu. O Lado guarda o código, a oferta, a data e se foi usado na loja, sem nada que identifique você.</li>
 <li><strong>Denúncias:</strong> podem ser enviadas sem identificação. Guardamos só o perfil denunciado, o motivo e o texto que você escrever.</li>
 <li>Ao tocar em "Como chegar", "WhatsApp" ou "Avaliar no Google", você sai do Lado e passa a usar o app correspondente, com as regras de privacidade dele.</li>
 </ul>
@@ -55,7 +57,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
 <li><strong>Verificação:</strong> o CPF digitado no cadastro é conferido no próprio aparelho com os dados públicos da Receita e não é enviado ao Lado. Quando a equipe verifica manualmente, guardamos só o resultado, o método e um registro protegido (hash) do CPF. Os códigos de verificação enviados por e-mail são guardados só de forma protegida (hash) e valem 15 minutos.</li>
 <li><strong>Pagamentos:</strong> plano, valor, data, forma (Pix ou cartão), situação e o código do Mercado Pago. Dados do cartão e da conta bancária ficam com o Mercado Pago; o Lado não os recebe.</li>
 <li><strong>Contratação não concluída:</strong> quando a empresa abre o pagamento no site e não conclui, registramos o plano escolhido e a data, para enviar até dois lembretes.</li>
-<li><strong>Estatísticas:</strong> contagem mensal de aberturas do perfil e de toques em rota, WhatsApp e cupom (números agregados).</li>
+<li><strong>Estatísticas:</strong> contagem mensal de aparições, aberturas do perfil, toques em rota, WhatsApp, redes sociais e cupom, cupons usados na loja, totais de seguidores e curtidas, e médias da mesma categoria no bairro ou na cidade (só com 5 ou mais empresas, sem mostrar números de nenhuma outra empresa).</li>
 <li><strong>Atendimento e moderação:</strong> mensagens trocadas com o suporte, denúncias sobre o perfil, contestações de cadastro e decisões da equipe, com o motivo.</li>
 <li><strong>Registros de acesso:</strong> endereço IP, data e hora de entrada e uso da conta (veja o item 7).</li>
 </ul>
@@ -64,6 +66,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
 <p>Posicionamento político é dado pessoal sensível quando pode ser ligado a uma pessoa, por exemplo no caso de MEI ou empresário individual, em que a empresa se confunde com o titular. Por isso:</p>
 <ul>
 <li>a declaração só é publicada com <strong>consentimento específico e destacado</strong> (LGPD, art. 11, I), registrado a cada mudança;</li>
+<li>a empresa pode aparecer como <strong>neutra</strong>: nesse caso nenhum posicionamento é publicado;</li>
 <li>o consentimento pode ser revogado a qualquer momento, tirando a empresa do mapa (efeito imediato) ou excluindo a conta;</li>
 <li>o lado não é usado para nenhuma outra finalidade: não fazemos perfis, rankings, anúncios ou recomendações a partir dele.</li>
 </ul>
@@ -159,5 +162,6 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
     <a href="../suporte/">Central de suporte</a>
   </nav>
 </div></footer>
+
 </body>
 </html>
