@@ -68,7 +68,9 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
 .ae .chips button{font:inherit;font-size:14px;padding:7px 12px;border-radius:999px;border:1px solid var(--borda);background:var(--fundo);color:var(--texto);cursor:pointer}
 .ae .chips button.on{background:var(--grafite);color:#fff;border-color:var(--grafite)}
 .ae .lados{display:flex;gap:10px}.ae .lados button{flex:1;font:inherit;font-weight:700;padding:16px;border-radius:14px;border:2px solid var(--borda);background:var(--fundo);color:var(--texto);cursor:pointer}
-.ae .lados button.esq.on{border-color:var(--esq)}.ae .lados button.dir.on{border-color:var(--dir)}
+.ae .lados button.esq.on{border-color:var(--esq)}.ae .lados button.dir.on{border-color:var(--dir)}.ae .lados button.neu.on{border-color:#1B2228}
+.ae .bolinhaNeu{display:inline-block;width:11px;height:11px;border-radius:50%;background:#fff;border:1.5px solid #1B2228;vertical-align:middle;margin-right:4px}
+.ae .etiqueta.neutro{background:#fff!important;color:#1B2228;border:1.5px solid #1B2228}
 .ae .check{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:15px}.ae .check input{width:20px;height:20px;flex:none;margin-top:2px}
 #mapa{height:320px;border-radius:14px;margin-top:10px;border:1px solid var(--borda)}
 .oculto{display:none!important}
@@ -134,8 +136,8 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
 
     <div data-passo="4" class="oculto">
       <h2>Como sua empresa se identifica?</h2>
-      <p class="sub" style="margin:0">Escolha livre. Você pode mudar de lado ou sair do mapa quando quiser.</p>
-      <div class="lados" style="margin-top:12px"><button type="button" class="esq" data-lado="esquerda">● Esquerda</button><button type="button" class="dir" data-lado="direita">● Direita</button></div>
+      <p class="sub" style="margin:0">Escolha livre. Neutro: sua empresa aparece no mapa sem lado. Você pode mudar ou sair do mapa quando quiser.</p>
+      <div class="lados" style="margin-top:12px"><button type="button" class="neu" data-lado="neutro"><span class="bolinhaNeu"></span>Neutro</button><button type="button" class="esq" data-lado="esquerda">● Esquerda</button><button type="button" class="dir" data-lado="direita">● Direita</button></div>
     </div>
 
     <div data-passo="5" class="oculto">
@@ -176,6 +178,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
         <span id="pLado" class="etiqueta" style="flex:0 0 auto"></span>
       </div>
       <div id="pPlano" class="msg info"></div>
+      <div id="trocaLado" class="chips" style="margin-top:4px"></div>
       <div id="msgPainel"></div>
     </div>
 
@@ -206,11 +209,11 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
       <div id="cupomAviso" class="oculto"></div>
       <div class="planos">
         <div class="plano prata"><span class="selo-ouro selo-prata"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>Boa visibilidade</span><h2 style="margin:0">Vitrine</h2><div class="preco">R$ 39,90 <small>/mês</small></div>
-          <ul><li>Contorno prata no mapa</li><li>30 fotos</li><li>3 publicações por semana</li><li>2 ofertas com cupom</li></ul>
+          <ul><li>Pin médio prata no mapa</li><li>30 fotos e 3 publicações por semana</li><li>2 ofertas com cupom validado no caixa</li><li>Curtidas e aviso a quem segue (2 por mês)</li><li>Estatísticas completas e custo por cliente</li></ul>
           <button class="botao" data-plano="vitrine" data-mod="pix" type="button">Pagar com Pix · 30 dias</button>
           <button class="botao claro" data-plano="vitrine" data-mod="cartao" type="button">Assinar no cartão · mensal</button></div>
         <div class="plano ouro"><span class="selo-ouro"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>Mais visibilidade</span><h2 style="margin:0">Destaque ★</h2><div class="preco">R$ 79,90 <small>/mês</small></div>
-          <ul><li>Contorno dourado com estrela</li><li>Topo do bairro</li><li>Publicações e ofertas ilimitadas</li><li>Aparece primeiro em "Perto de você"</li></ul>
+          <ul><li>Pin grande dourado, sempre primeiro</li><li>Fotos, publicações e ofertas ilimitadas</li><li>Oferta relâmpago e aviso a quem segue sem limite</li><li>Comparação com a sua categoria no bairro</li><li>Tudo do Vitrine</li></ul>
           <button class="botao" data-plano="destaque" data-mod="pix" type="button">Pagar com Pix · 30 dias</button>
           <button class="botao claro" data-plano="destaque" data-mod="cartao" type="button">Assinar no cartão · mensal</button></div>
       </div>
@@ -268,7 +271,8 @@ const reais = (v) => 'R$ ' + Number(v).toFixed(2).replace('.', ',');
 const dig = (s) => String(s ?? '').replace(/\D/g, '');
 const NOME = { gratis: 'Grátis', vitrine: 'Vitrine', destaque: 'Destaque ★' };
 const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-const COR = { esquerda: '#C93A30', direita: '#2556BE' };
+const COR = { esquerda: '#C93A30', direita: '#2556BE', neutro: '#FFFFFF' };
+const NOME_LADO = { neutro: 'Neutro', esquerda: 'Esquerda', direita: 'Direita' };
 let empresa = null;
 
 // Cupom dos e-mails de recuperação (?cupom=VOLTA...): guardado até a pessoa entrar e usar.
@@ -364,7 +368,7 @@ async function abrirPainel() {
   const e = empresa;
   $('titulo').textContent = e.nome_fantasia; $('subtitulo').textContent = 'Plano, estatísticas, pagamentos e assinatura da sua empresa.';
   $('pNome').textContent = e.nome_fantasia; $('pLocal').textContent = `${e.categoria} · ${e.bairro} · ${e.cidade} – ${e.uf}`;
-  $('pLado').textContent = e.lado === 'esquerda' ? 'Esquerda' : 'Direita'; $('pLado').style.background = COR[e.lado];
+  $('pLado').textContent = NOME_LADO[e.lado] || ''; $('pLado').style.background = COR[e.lado]; $('pLado').classList.toggle('neutro', e.lado === 'neutro');
   const emTeste = e.plano === 'gratis' && e.teste_destaque_ate && new Date(e.teste_destaque_ate) > new Date();
   $('pPlano').innerHTML = e.status === 'suspensa'
     ? '<strong>Empresa fora do mapa.</strong> Fale com a equipe para entender o motivo.'
@@ -372,6 +376,20 @@ async function abrirPainel() {
       `Plano atual: <strong>${NOME[e.plano]}</strong>` + (e.plano !== 'gratis' && e.plano_ate ? ` · vale até <strong>${dataBR(e.plano_ate)}</strong>` : '') +
       (emTeste ? ` · com teste grátis do Destaque até <strong>${dataBR(e.teste_destaque_ate)}</strong>` : '');
   $('blocoPlanos').classList.toggle('oculto', e.status !== 'publicada');
+  // Troca de lado (3 opções). Para Neutro não há declaração de posicionamento; para um lado, pede a autorização.
+  $('trocaLado').innerHTML = ['neutro','esquerda','direita'].filter(l => l !== e.lado)
+    .map(l => `<button type="button" data-troca="${l}">Mudar para ${NOME_LADO[l]}</button>`).join('');
+  document.querySelectorAll('[data-troca]').forEach(b => b.onclick = async () => {
+    const l = b.dataset.troca;
+    const texto = l === 'neutro'
+      ? `Mudar para Neutro?\n\nA empresa ${e.razao_social || e.nome_fantasia} passa a aparecer no mapa como Neutra, sem lado.`
+      : `Mudar para ${NOME_LADO[l]}?\n\nAutorizo o Lado a exibir publicamente que a empresa ${e.razao_social || e.nome_fantasia} se identifica como ${NOME_LADO[l]}.`;
+    if (!confirm(texto)) return;
+    const { error } = await sb.rpc('trocar_lado', { p_empresa: e.id, p_lado: l, p_versao_termos: 'v4-2026-11-10', p_aparelho: ('Site · ' + navigator.userAgent).slice(0, 200) });
+    if (error) { msg('msgPainel', 'erro', 'Não foi possível mudar agora. Tente de novo ou fale com a equipe.'); return; }
+    const { data } = await sb.rpc('minha_empresa'); if (data && data[0]) empresa = data[0];
+    await abrirPainel(); msg('msgPainel', 'ok', `Pronto: sua empresa agora aparece como ${NOME_LADO[l]}.`);
+  });
   if (e.status === 'publicada') {
     $('pPlano').insertAdjacentHTML('beforeend', '<br><button class="link" id="btnTirarMapa" type="button" style="margin:8px 0 0;padding:0">Tirar minha empresa do mapa</button>');
     $('btnTirarMapa').onclick = async () => {
@@ -392,6 +410,7 @@ async function abrirPainel() {
   };
   await Promise.all([carregarOferta(), carregarEstatisticas(), carregarAssinatura(), carregarPagamentos(), carregarQR()]);
 }
+
 /* ---------------- QR code da empresa ---------------- */
 function desenharQR(ctx, link, x, y, tam) {
   const m = window.LadoQR(link), n = m.length, q = 4, cel = tam / (n + 2 * q);
@@ -430,39 +449,36 @@ async function carregarQR() {
   $('btnBaixarQR').onclick = () => { const c = document.createElement('canvas'); c.width = c.height = 1000; desenharQR(c.getContext('2d'), link, 0, 0, 1000); baixarCanvas(c, `lado-qrcode-${slug}.png`); };
 }
 
-
 async function carregarOferta() {
+  // 1.0.2: a oferta de 3 meses acabou. Mostra só quanto falta do teste de 14 dias de Destaque.
   const b = $('blocoOferta');
-  const { data } = await sb.rpc('minha_oferta'); const o = data && data[0];
-  if (o && o.garantida) {
-    b.classList.remove('oculto');
-    b.innerHTML = `<h2>Oferta de lançamento garantida ★</h2><p class="sub" style="margin:0">Destaque grátis até <strong>${dataBR(o.ate)}</strong>. Depois a empresa volta ao plano Grátis, sem cobrança.</p>`;
-    return;
-  }
-  if (!o || !(o.restantes > 0) || empresa.status !== 'publicada') { b.classList.add('oculto'); return; }
-  const usadas = 10 - o.restantes;
+  const e = empresa;
+  const ate = e.teste_destaque_ate ? new Date(e.teste_destaque_ate) : null;
+  if (e.plano !== 'gratis' || !ate || ate <= new Date()) { b.classList.add('oculto'); return; }
+  const dias = Math.max(1, Math.ceil((ate - new Date()) / 86400000));
   b.classList.remove('oculto'); b.style.borderColor = '#F0B429'; b.style.borderWidth = '2px';
-  b.innerHTML = `<p class="spam" style="margin:0;font-weight:700;letter-spacing:.5px">OFERTA DE LANÇAMENTO · ${esc(o.cidade.toUpperCase())}</p>
-    <h2 style="margin:4px 0">Destaque grátis por 3 meses</h2>
-    <p class="sub" style="margin:0">Só para as <strong>10 primeiras empresas de ${esc(o.cidade)}</strong> que aceitarem. Quando as vagas acabam, a oferta sai do ar. Não custa nada e não pedimos cartão.</p>
-    <div class="vagas">${Array.from({length:10},(_,i)=>`<span style="background:${i<usadas?'var(--borda)':(i%2?'#2556BE':'#C93A30')}"></span>`).join('')}</div>
-    <strong style="color:${o.restantes<=3?'#C93A30':'inherit'}">${o.restantes===1?'Corra: resta só 1 vaga!':o.restantes<=3?`Corra: restam só ${o.restantes} vagas!`:`Restam ${o.restantes} de 10 vagas`}</strong><br>
-    <button class="botao" id="btnVaga" type="button">Quero minha vaga</button><div id="msgVaga"></div>`;
-  $('btnVaga').onclick = async () => {
-    $('btnVaga').disabled = true;
-    const { data: ate, error } = await sb.rpc('pegar_vaga_oferta');
-    if (error) { msg('msgVaga', 'erro', esc(error.message)); $('btnVaga').disabled = false; return; }
-    msg('msgVaga', 'ok', `Vaga garantida! Destaque grátis até <strong>${dataBR(ate)}</strong>. Enviamos a confirmação por e-mail.` + SPAM);
-    const r = await sb.rpc('minha_empresa'); empresa = r.data[0]; setTimeout(abrirPainel, 2500);
-  };
+  b.innerHTML = `<h2 style="margin:0 0 4px">Destaque grátis: ${dias === 1 ? 'falta 1 dia' : `faltam ${dias} dias`}</h2>
+    <p class="sub" style="margin:0">Até <strong>${dataBR(e.teste_destaque_ate)}</strong>. Depois a empresa volta ao plano Grátis, sem cobrança. Para continuar no topo, escolha o Destaque ou o Vitrine logo abaixo.</p>`;
 }
 
 async function carregarEstatisticas() {
-  const { data } = await sb.rpc('minhas_estatisticas');
-  const d = data || []; const at = d[0] || { perfil: 0, cupom: 0, whatsapp: 0, rota: 0 }; const ant = d[1];
-  $('quadros').innerHTML = [[at.perfil,'pessoas abriram seu card'],[at.cupom,'pegaram cupom'],[at.whatsapp,'chamaram no WhatsApp'],[at.rota,'pediram rota']]
-    .map(([n,t]) => `<div class="quadro"><span class="numq">${n}</span>${t}</div>`).join('');
-  $('variacao').textContent = ant && ant.perfil > 0 ? `${at.perfil >= ant.perfil ? '▲' : '▼'} ${Math.abs(Math.round((at.perfil - ant.perfil) / ant.perfil * 100))}% de aberturas do card em relação ao mês passado.` : '';
+  const { data } = await sb.rpc('minhas_estatisticas_v2');
+  const d = data || [];
+  const at = d[0] || { perfil: 0, cupom: 0, whatsapp: 0, rota: 0, cupom_usado: 0, seguidores: 0, nivel: 1 }; const ant = d[1];
+  const q = (n, t) => `<div class="quadro"><span class="numq">${n ?? 0}</span>${t}</div>`;
+  let html = [q(at.perfil,'abriram seu card'), q(at.whatsapp,'chamaram no WhatsApp'), q(at.rota,'pediram rota'), q(at.cupom,'pegaram cupom'),
+    q(at.cupom_usado,'usaram o cupom na loja'), q(at.seguidores, at.seguidores === 1 ? 'seguidor' : 'seguidores')].join('');
+  if (at.nivel >= 2) {
+    html += [q(at.aparicao,'apareceram no mapa ou na lista'), q(at.instagram,'cliques no Instagram'), q(at.facebook,'cliques no Facebook'),
+      q(at.tiktok,'cliques no TikTok'), q(at.site,'cliques no site')].join('');
+    const clientes = (at.whatsapp || 0) + (at.rota || 0) + (at.cupom_usado || 0);
+    const preco = { vitrine: 39.9, destaque: 79.9 }[empresa.plano];
+    $('variacao').innerHTML = (preco && clientes > 0 ? `Este mês, o Lado te trouxe <strong>${clientes} ${clientes === 1 ? 'contato' : 'contatos'}</strong> por <strong>${reais(preco / clientes)}</strong> cada. ` : '') +
+      (ant && ant.perfil > 0 ? `${at.perfil >= ant.perfil ? '▲' : '▼'} ${Math.abs(Math.round((at.perfil - ant.perfil) / ant.perfil * 100))}% de aberturas do card em relação ao mês passado.` : '');
+  } else {
+    $('variacao').innerHTML = 'Funil completo, 6 meses, cliques nas redes, curtidas e custo por cliente fazem parte dos planos Vitrine e Destaque.';
+  }
+  $('quadros').innerHTML = html;
   const maior = Math.max(1, ...d.map(x => x.perfil));
   $('barras').innerHTML = [...d].reverse().map((x, i, arr) => `<div>${x.perfil}<i class="${i === arr.length - 1 ? 'atual' : ''}" style="height:${Math.max(4, x.perfil / maior * 70)}px"></i>${MESES[new Date(x.mes + 'T12:00:00').getMonth()]}</div>`).join('');
 }
@@ -656,7 +672,7 @@ async function abrirVerificacao() {
     const o = await chamarCodigo({ acao: 'opcoes', empresa_id: empresa.id });
     if (o && o.verificada) {
       $('btnEnviarCodigo').classList.add('oculto');
-      $('verifDestino').innerHTML = '<span class="ok">✓ Empresa verificada automaticamente!</span> O e-mail do seu login é o mesmo da Receita. Ela já está no mapa, com 5 dias de Destaque grátis. Enviamos um e-mail de boas-vindas.' + SPAM;
+      $('verifDestino').innerHTML = '<span class="ok">✓ Empresa verificada automaticamente!</span> O e-mail do seu login é o mesmo da Receita. Ela já está no mapa, com 14 dias de Destaque grátis. Enviamos um e-mail de boas-vindas.' + SPAM;
       setTimeout(iniciar, 3500); return;
     }
     $('verifDestino').innerHTML = o && o.email ? `O código vai para <strong>${esc(o.email)}</strong>.` : 'Não encontramos e-mail da empresa na Receita. Fale com a equipe no WhatsApp para verificar.';
@@ -676,14 +692,14 @@ $('btnConfirmar').onclick = async () => {
   const { data, error } = await sb.rpc('confirmar_codigo', { p_empresa: empresa.id, p_codigo: dig($('codigo').value) });
   if (error) { msg('msgVerif', 'erro', esc(error.message)); return; }
   if (data === 'CODIGO_ERRADO') { msg('msgVerif', 'erro', 'Código incorreto. Confira os 6 números do e-mail.'); return; }
-  msg('msgVerif', 'ok', 'Empresa verificada ✓ Já está no mapa, com 5 dias de Destaque grátis. Enviamos um e-mail de boas-vindas.' + SPAM);
+  msg('msgVerif', 'ok', 'Empresa verificada ✓ Já está no mapa, com 14 dias de Destaque grátis. Enviamos um e-mail de boas-vindas.' + SPAM);
   setTimeout(iniciar, 2500);
 };
 
 /* ---------------- Cadastro ---------------- */
 const TIPOS = ['Padaria','Confeitaria','Café','Restaurante','Pizzaria','Hamburgueria','Lanchonete','Pastelaria','Açaí','Sorveteria','Bar','Churrascaria','Comida japonesa','Marmitaria','Doceria','Mercado','Hortifruti','Açougue','Peixaria','Distribuidora de bebidas','Moda','Calçados','Joalheria','Ótica','Beleza','Salão de beleza','Manicure','Barbearia','Estética','Tatuagem','Saúde','Clínica','Dentista','Farmácia','Psicologia','Fisioterapia','Academia','Pet shop','Veterinário','Automotivo','Lava jato','Oficina mecânica','Autopeças','Borracharia','Posto de combustível','Motos','Material de construção','Construção e reforma','Móveis','Eletricista','Encanador','Vidraçaria','Serralheria','Imobiliária','Floricultura','Papelaria','Livraria','Informática','Celulares','Eletrônicos','Presentes','Brinquedos','Esportes','Instrumentos musicais','Gráfica','Fotografia','Eventos e festas','Lavanderia','Costura','Chaveiro','Escola e cursos','Advocacia','Contabilidade','Hospedagem','Pousada','Turismo','Transporte e fretes','Serviços','Outros'];
 const POP = ['Padaria','Restaurante','Lanchonete','Mercado','Moda','Salão de beleza','Barbearia','Lava jato','Oficina mecânica','Pet shop','Farmácia','Academia'];
-const norm = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[-_/]+/g, ' ').trim();
+const norm = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[-_/]+/g, ' ').trim();
 const cad = { passo: 1, receita: null, tipo: null, socio: null, manual: false, lado: null, lat: -15.78, lng: -47.93 };
 let mapa = null, pin = null;
 
@@ -700,7 +716,9 @@ function irPasso(n) {
   $('btnVoltar').classList.toggle('oculto', n === 1);
   $('btnAvancar').textContent = n === 5 ? 'Enviar para verificação' : 'Continuar';
   if (n === 3) abrirMapa();
-  if (n === 5) $('ok1txt').innerHTML = `Autorizo o Lado a exibir publicamente, no mapa e no portfólio, que a empresa <strong>${esc(cad.receita.razao_social)}</strong> se identifica como <strong>${cad.lado === 'esquerda' ? 'Esquerda' : 'Direita'}</strong>.`;
+  if (n === 5) $('ok1txt').innerHTML = cad.lado === 'neutro'
+    ? `Sei que a empresa <strong>${esc(cad.receita.razao_social)}</strong> aparece no mapa e no portfólio como <strong>Neutra</strong>, sem lado.`
+    : `Autorizo o Lado a exibir publicamente, no mapa e no portfólio, que a empresa <strong>${esc(cad.receita.razao_social)}</strong> se identifica como <strong>${NOME_LADO[cad.lado]}</strong>.`;
 }
 $('btnVoltar').onclick = () => irPasso(cad.passo - 1);
 $('cnpj').oninput = () => { let d = dig($('cnpj').value).slice(0,14); $('cnpj').value = d.replace(/^(\d{2})(\d)/,'$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3').replace(/\.(\d{3})(\d)/,'.$1/$2').replace(/(\d{4})(\d)/,'$1-$2'); };
@@ -807,7 +825,7 @@ $('btnAvancar').onclick = async () => {
   if (p === 1 && /\d{2}\.?\d{3}\.?\d{3}/.test($('nome').value)) { msg('msgCadastro', 'erro', 'Use o nome da sua loja, sem os números do CNPJ.'); return; }
   if (p === 2 && !cad.socio) { msg('msgCadastro', 'erro', 'Confira seu CPF no quadro de sócios para continuar.'); return; }
   if (p === 3 && $('bairro').value.trim().length < 2) { msg('msgCadastro', 'erro', 'Informe o bairro.'); return; }
-  if (p === 4 && !cad.lado) { msg('msgCadastro', 'erro', 'Escolha Esquerda ou Direita.'); return; }
+  if (p === 4 && !cad.lado) { msg('msgCadastro', 'erro', 'Escolha Neutro, Esquerda ou Direita.'); return; }
   if (p < 5) { irPasso(p + 1); return; }
   if (!($('ok1').checked && $('ok2').checked && $('ok3').checked)) { msg('msgCadastro', 'erro', 'Marque as três autorizações para enviar.'); return; }
   $('btnAvancar').disabled = true;
@@ -820,7 +838,7 @@ $('btnAvancar').onclick = async () => {
       latitude: cad.lat, longitude: cad.lng, lado: cad.lado,
     }).select('id').single();
     if (error) throw new Error(/duplicate|unique/i.test(error.message) ? 'Este CNPJ já está cadastrado no Lado. Se não foi você, use "Não reconheço este cadastro" no rodapé do site.' : 'Não foi possível enviar agora. Tente de novo em instantes.');
-    const { error: e2 } = await sb.from('consentimentos').insert({ empresa_id: emp.id, usuario_id: u.user.id, lado: cad.lado, versao_termos: 'v3-2026-11-02',
+    const { error: e2 } = await sb.from('consentimentos').insert({ empresa_id: emp.id, usuario_id: u.user.id, lado: cad.lado, versao_termos: 'v4-2026-11-10',
       aceitou_exibir: true, aceitou_remover: true, aceitou_termos: true, aparelho: ('Site · ' + navigator.userAgent).slice(0, 200) });
     if (e2) throw new Error('Não foi possível registrar a autorização. Tente de novo.');
     await iniciar();
@@ -855,5 +873,6 @@ iniciar().then(() => { if (empresa && empresa.status !== 'pendente') conferirRet
     <a href="../suporte/">Central de suporte</a>
   </nav>
 </div></footer>
+
 </body>
 </html>
