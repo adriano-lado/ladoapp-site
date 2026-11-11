@@ -7,7 +7,7 @@
 <meta name="description" content="Veja esta empresa no app Lado.">
 <meta name="theme-color" content="#1B2228">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../estilo.css">
+<link rel="stylesheet" href="../estilo.css?v=20261103j">
 <script>/* Modo app: páginas abertas pelo app (?app=1) não mostram planos, preços nem links de compra. */
 (function(){var d=document.documentElement,on=/[?&]app=1(&|$)/.test(location.search);
 try{if(on)sessionStorage.setItem('ladoApp','1');on=on||sessionStorage.getItem('ladoApp')==='1';}catch(e){}
@@ -53,7 +53,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
   document.title=e.nome_fantasia+' · Lado';
   document.getElementById('eNome').textContent=e.nome_fantasia;
   document.getElementById('eLocal').textContent=[e.categoria,e.bairro,e.cidade&&(e.cidade+(e.uf?' – '+e.uf:''))].filter(Boolean).join(' · ');
-  var l=document.getElementById('eLado');l.textContent=e.lado==='esquerda'?'Esquerda':'Direita';l.style.background=e.lado==='esquerda'?'#C93A30':'#2556BE';
+  var l=document.getElementById('eLado');l.textContent=e.lado==='esquerda'?'Esquerda':e.lado==='direita'?'Direita':'Neutro';l.style.background=e.lado==='esquerda'?'#C93A30':e.lado==='direita'?'#2556BE':'#FFFFFF';if(e.lado==='neutro'){l.style.color='#1B2228';l.style.border='1.5px solid #1B2228';}
   document.getElementById('eAbrir').href='lado://empresa/'+id;
   var ua=navigator.userAgent, ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&'ontouchend' in document), andr=/Android/.test(ua);
   if(ios)document.getElementById('eAndroid').hidden=true;
@@ -83,5 +83,6 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
     <a href="../suporte/">Central de suporte</a>
   </nav>
 </div></footer>
+
 </body>
 </html>
