@@ -209,7 +209,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
       <div id="cupomAviso" class="oculto"></div>
       <div class="planos">
         <div class="plano prata"><span class="selo-ouro selo-prata"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>Boa visibilidade</span><h2 style="margin:0">Vitrine</h2><div class="preco">R$ 39,90 <small>/mês</small></div>
-          <ul><li>Pin médio prata no mapa</li><li>30 fotos e 3 publicações por semana</li><li>2 ofertas com cupom validado no caixa</li><li>Curtidas e aviso a quem segue (2 por mês)</li><li>Estatísticas completas e custo por cliente</li></ul>
+          <ul><li>Pin médio prata no mapa</li><li>30 fotos e 3 publicações por semana</li><li>2 ofertas com cupom validado no caixa</li><li>Curtidas e aviso a quem segue (2 por mês)</li><li>Estatísticas completas: custo por contato e por venda</li></ul>
           <button class="botao" data-plano="vitrine" data-mod="pix" type="button">Pagar com Pix · 30 dias</button>
           <button class="botao claro" data-plano="vitrine" data-mod="cartao" type="button">Assinar no cartão · mensal</button></div>
         <div class="plano ouro"><span class="selo-ouro"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>Mais visibilidade</span><h2 style="margin:0">Destaque ★</h2><div class="preco">R$ 79,90 <small>/mês</small></div>
@@ -471,12 +471,14 @@ async function carregarEstatisticas() {
   if (at.nivel >= 2) {
     html += [q(at.aparicao,'apareceram no mapa ou na lista'), q(at.instagram,'cliques no Instagram'), q(at.facebook,'cliques no Facebook'),
       q(at.tiktok,'cliques no TikTok'), q(at.site,'cliques no site')].join('');
-    const clientes = (at.whatsapp || 0) + (at.rota || 0) + (at.cupom_usado || 0);
+    // Contato não é cliente: contatos = WhatsApp + rota; vendas = cupons validados no caixa.
+    const contatos = (at.whatsapp || 0) + (at.rota || 0), vendas = at.cupom_usado || 0;
     const preco = { vitrine: 39.9, destaque: 79.9 }[empresa.plano];
-    $('variacao').innerHTML = (preco && clientes > 0 ? `Este mês, o Lado te trouxe <strong>${clientes} ${clientes === 1 ? 'contato' : 'contatos'}</strong> por <strong>${reais(preco / clientes)}</strong> cada. ` : '') +
+    $('variacao').innerHTML = (preco && contatos > 0 ? `Este mês: <strong>${contatos} ${contatos === 1 ? 'contato' : 'contatos'}</strong> (WhatsApp e rota) por <strong>${reais(preco / contatos)}</strong> cada. ` : '') +
+      (preco && vendas > 0 ? `<strong>${vendas} ${vendas === 1 ? 'venda confirmada' : 'vendas confirmadas'}</strong> pelo cupom no caixa por <strong>${reais(preco / vendas)}</strong> cada. ` : '') +
       (ant && ant.perfil > 0 ? `${at.perfil >= ant.perfil ? '▲' : '▼'} ${Math.abs(Math.round((at.perfil - ant.perfil) / ant.perfil * 100))}% de aberturas do card em relação ao mês passado.` : '');
   } else {
-    $('variacao').innerHTML = 'Funil completo, 6 meses, cliques nas redes, curtidas e custo por cliente fazem parte dos planos Vitrine e Destaque.';
+    $('variacao').innerHTML = 'Funil completo, 6 meses, cliques nas redes, curtidas e custo por contato e por venda fazem parte dos planos Vitrine e Destaque.';
   }
   $('quadros').innerHTML = html;
   const maior = Math.max(1, ...d.map(x => x.perfil));
