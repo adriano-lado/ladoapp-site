@@ -47,7 +47,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|empresas|planos)\//.test(loca
       <tr><th scope="row">Quantas empresas do mesmo ramo podem ter o plano no bairro</th><td>Sem limite</td><td>Sem limite</td><td class="col-ouro"><b>Só 5</b> (ex.: até 5 padarias em Itapuã). Menos concorrência no topo.</td></tr>
       <tr class="grupo"><th colspan="4" scope="rowgroup">Perfil da empresa</th></tr>
       <tr><th scope="row">Selo Verificado, lado declarado, logo</th><td>Sim</td><td>Sim</td><td class="col-ouro">Sim</td></tr>
-      <tr><th scope="row">Fotos da vitrine</th><td>3</td><td>30</td><td class="col-ouro">Ilimitadas</td></tr>
+      <tr><th scope="row">Fotos da vitrine (total no perfil)</th><td>Até 3</td><td>Até 15</td><td class="col-ouro">Ilimitadas</td></tr>
       <tr><th scope="row">Publicações</th><td>1 por semana</td><td>3 por semana</td><td class="col-ouro">Ilimitadas</td></tr>
       <tr><th scope="row">Cardápio ou catálogo com preços</th><td>—</td><td>Até 15 itens</td><td class="col-ouro">Ilimitado</td></tr>
       <tr><th scope="row">Produtos do cardápio na busca</th><td>—</td><td>Sim</td><td class="col-ouro">Sim</td></tr>
@@ -159,6 +159,126 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|empresas|planos)\//.test(loca
   <a class="botao" href="/empresa/">Cadastrar minha empresa</a>
   <a class="botao" href="https://wa.me/5527992650771?text=Ol%C3%A1!%20Preciso%20de%20ajuda%20com%20o%20app%20Lado." target="_blank" rel="noopener">Falar no WhatsApp</a>
 </section>
+
+<style>
+/* Celular: planos e comparativo em cartões que deslizam para o lado (montados a partir das tabelas). */
+.car-cel{display:none}
+@media (max-width:760px){
+  .cel-ok .grade-planos,.cel-ok .titulo-tabela,.cel-ok .tabela-rolar{display:none}
+  .cel-ok .car-cel{display:block}
+  .car-trilho{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:18px 16px 14px;margin:8px -16px 0;scrollbar-width:none}
+  .car-trilho::-webkit-scrollbar{display:none}
+  .car-trilho>.cartao{flex:0 0 84%;scroll-snap-align:center;position:relative;padding:22px 18px 18px;display:flex;flex-direction:column}
+  .car-dica{font-size:13px;color:var(--texto2);margin:6px 0 0;text-align:center}
+  .car-nav{display:flex;justify-content:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+  .car-nav button{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--borda);background:var(--sup);color:var(--texto2);border-radius:999px;padding:7px 14px;cursor:pointer}
+  .car-nav button[aria-current="true"]{background:var(--grafite);border-color:var(--grafite);color:#fff}
+  .car-dia{font-size:13px;color:var(--texto2);margin:-4px 0 12px}
+  .car-lista{list-style:none;margin:0;padding:0}
+  .car-lista li{display:grid;grid-template-columns:20px 1fr;gap:8px;font-size:15px;line-height:1.35;color:var(--texto);padding:10px 0;border-bottom:1px solid var(--borda)}
+  .car-lista li:last-child{border-bottom:0}
+  .car-lista li .ic{font-weight:800;color:var(--verde);text-align:center}
+  .car-lista li.nao{color:var(--texto2);opacity:.55;text-decoration:line-through}
+  .car-lista li.nao .ic{color:var(--texto2)}
+  .car-lista li small{display:block;color:var(--texto2);font-size:13.5px;text-decoration:none}
+  .car-mais{margin:12px 0 4px;border-top:1px solid var(--borda);padding-top:10px}
+  .car-mais summary{cursor:pointer;font-weight:700;font-size:14.5px;list-style:none;color:var(--texto)}
+  .car-mais summary::-webkit-details-marker{display:none}
+  .car-mais summary::after{content:" ⌄";font-weight:700}
+  .car-mais[open] summary::after{content:" ⌃"}
+  .car-grupo{font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--texto2);margin:16px 0 2px;font-weight:700;padding:6px 10px;background:var(--fundo);border-radius:8px}
+  .car-dia{margin-bottom:4px!important}
+  .car-trilho .cta{align-self:stretch;text-align:center;margin-top:14px;font-weight:700;font-size:15px;border-radius:10px;padding:11px 14px;text-decoration:none}
+  .car-comp{margin:6px 0 0}
+  .car-comp dt{font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--texto2);font-weight:700;padding-top:12px}
+  .car-comp dd{margin:4px 0 0;font-size:15px;line-height:1.4;color:var(--texto);padding-bottom:12px;border-bottom:1px solid var(--borda)}
+  .car-comp dd:last-child{border-bottom:0;padding-bottom:0}
+  .car-trilho>.cartao.neutro{border:1px solid var(--borda)}
+}
+</style>
+<script>
+(function () {
+  if (!document.querySelector) return;
+  var PLANOS = [
+    { k: 'gratis', nome: 'Grátis', cls: 'gratis', preco: 'R$ 0', dia: 'Para começar, sem custo.', cta: 'Cadastrar grátis →', href: '/empresa/' },
+    { k: 'vitrine', nome: 'Vitrine', cls: 'prata', selo: 'Boa visibilidade', preco: 'R$ 39,90<small>/mês</small>', dia: 'Cerca de R$ 1,33 por dia.', cta: 'Quero o Vitrine →', href: '/empresa/#blocoPlanos' },
+    { k: 'destaque', nome: 'Destaque', cls: 'ouro', selo: 'Mais visibilidade', preco: 'R$ 79,90<small>/mês</small>', dia: 'Cerca de R$ 2,66 por dia.', cta: 'Quero o Destaque →', href: '/empresa/#blocoPlanos' }
+  ];
+  function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+  function txt(el) { return (el.textContent || '').replace(/\s+/g, ' ').trim(); }
+
+  function navegar(trilho, nav, nomes) {
+    var cards = trilho.children;
+    nav.innerHTML = nomes.map(function (n, i) { return '<button type="button" data-i="' + i + '">' + esc(n) + '</button>'; }).join('');
+    var bts = nav.querySelectorAll('button');
+    function ir(i, suave) { var c = cards[i]; trilho.scrollTo({ left: c.offsetLeft - (trilho.clientWidth - c.clientWidth) / 2, behavior: suave ? 'smooth' : 'auto' }); }
+    function marcar() {
+      var meio = trilho.scrollLeft + trilho.clientWidth / 2, melhor = 0, dist = 1e9;
+      for (var i = 0; i < cards.length; i++) { var c = cards[i], d = Math.abs(c.offsetLeft + c.clientWidth / 2 - meio); if (d < dist) { dist = d; melhor = i; } }
+      for (var j = 0; j < bts.length; j++) bts[j].setAttribute('aria-current', j === melhor ? 'true' : 'false');
+    }
+    for (var b = 0; b < bts.length; b++) bts[b].onclick = function () { ir(+this.dataset.i, true); };
+    trilho.addEventListener('scroll', function () { clearTimeout(trilho._t); trilho._t = setTimeout(marcar, 60); }, { passive: true });
+    return { ir: ir, marcar: marcar };
+  }
+
+  // 1. Planos, a partir da tabela "Tudo o que cada plano inclui"
+  var secPlanos = document.getElementById('planos');
+  var tabPlanos = secPlanos && secPlanos.querySelector('table.tabela:not(.comp)');
+  if (tabPlanos) {
+    var grupos = [], atual = null;
+    tabPlanos.querySelectorAll('tbody tr').forEach(function (tr) {
+      if (tr.classList.contains('grupo')) { atual = { nome: txt(tr), itens: [] }; grupos.push(atual); return; }
+      var c = tr.querySelectorAll('td'); if (!atual || c.length < 3) return;
+      atual.itens.push({ rot: txt(tr.querySelector('th')), v: [txt(c[0]), txt(c[1]), txt(c[2])] });
+    });
+    var html = PLANOS.map(function (p, i) {
+      var todos = grupos.map(function (g) {
+        return '<p class="car-grupo">' + esc(g.nome) + '</p><ul class="car-lista">' + g.itens.map(function (it) {
+          var v = it.v[i];
+          if (v === '—') return '<li class="nao"><span class="ic">–</span><span>' + esc(it.rot) + '</span></li>';
+          if (v === 'Sim') return '<li><span class="ic">✓</span><span>' + esc(it.rot) + '</span></li>';
+          return '<li><span class="ic">✓</span><span>' + esc(it.rot) + '<small>' + esc(v) + '</small></span></li>';
+        }).join('') + '</ul>';
+      }).join('');
+      return '<div class="cartao ' + p.cls + '">' + (p.selo ? '<span class="selo-ouro' + (p.cls === 'prata' ? ' selo-prata' : '') + '">' + p.selo + '</span>' : '') +
+        '<h3>' + p.nome + '</h3><p class="preco">' + p.preco + '</p><p class="car-dia">' + p.dia + '</p>' +
+        todos +
+        '<a class="cta" href="' + p.href + '">' + p.cta + '</a></div>';
+    }).join('');
+    var box = document.createElement('div'); box.className = 'car-cel';
+    box.innerHTML = '<div class="car-trilho" aria-label="Planos: arraste para o lado">' + html + '</div><div class="car-nav" aria-label="Escolha o plano"></div><p class="car-dica">Arraste para o lado para comparar os planos.</p>';
+    var grade = secPlanos.querySelector('.grade');
+    grade.classList.add('grade-planos');
+    var tit = secPlanos.querySelector('h3.sub'); if (tit) tit.classList.add('titulo-tabela');
+    grade.parentNode.insertBefore(box, grade);
+    secPlanos.classList.add('cel-ok');
+    var navP = navegar(box.querySelector('.car-trilho'), box.querySelector('.car-nav'), PLANOS.map(function (p) { return p.nome; }));
+    requestAnimationFrame(function () { navP.ir(2, false); navP.marcar(); });
+  }
+
+  // 2. Lado x Google x Meta, a partir da tabela do comparativo
+  var secComp = document.getElementById('comparativo');
+  var tabComp = secComp && secComp.querySelector('table.comp');
+  if (tabComp) {
+    var cols = Array.prototype.slice.call(tabComp.querySelectorAll('thead th')).slice(1).map(txt);
+    var linhas = Array.prototype.map.call(tabComp.querySelectorAll('tbody tr'), function (tr) {
+      return { rot: txt(tr.querySelector('th')), v: Array.prototype.map.call(tr.querySelectorAll('td'), function (td) { return td.innerHTML; }) };
+    });
+    var htmlC = cols.map(function (nome, i) {
+      return '<div class="cartao ' + (i === 0 ? 'ouro' : 'neutro') + '">' + (i === 0 ? '<span class="selo-ouro">Preço fixo</span>' : '') +
+        '<h3>' + esc(nome) + '</h3><dl class="car-comp">' + linhas.map(function (l) { return '<dt>' + esc(l.rot) + '</dt><dd>' + l.v[i] + '</dd>'; }).join('') + '</dl></div>';
+    }).join('');
+    var boxC = document.createElement('div'); boxC.className = 'car-cel';
+    boxC.innerHTML = '<div class="car-trilho" aria-label="Comparativo: arraste para o lado">' + htmlC + '</div><div class="car-nav" aria-label="Escolha"></div><p class="car-dica">Arraste para ver o Google e a Meta.</p>';
+    var rolar = tabComp.closest('.tabela-rolar');
+    rolar.parentNode.insertBefore(boxC, rolar.nextSibling);
+    secComp.classList.add('cel-ok');
+    var navC = navegar(boxC.querySelector('.car-trilho'), boxC.querySelector('.car-nav'), ['Lado', 'Google Ads', 'Meta Ads']);
+    requestAnimationFrame(function () { navC.marcar(); });
+  }
+})();
+</script>
 
 </main>
 <footer class="rodape"><div class="in">
