@@ -8,17 +8,17 @@
 <meta name="theme-color" content="#1B2228">
 <meta name="facebook-domain-verification" content="1yegoz29eha89z8o2f8drxnde7g658" />
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./estilo.css?v=20261103j">
+<link rel="stylesheet" href="./estilo.css?v=20261111a">
 <script>/* Modo app: páginas abertas pelo app (?app=1) não mostram planos, preços nem links de compra. */
 (function(){var d=document.documentElement,on=/[?&]app=1(&|$)/.test(location.search);
 try{if(on)sessionStorage.setItem('ladoApp','1');on=on||sessionStorage.getItem('ladoApp')==='1';}catch(e){}
-if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.pathname))d.classList.add('app-bloq');}})();</script>
+if(on){d.classList.add('modo-app');if(/^\/(empresa|empresas|planos)\//.test(location.pathname))d.classList.add('app-bloq');}})();</script>
 <style>.modo-app .so-site{display:none!important}.app-bloq main>*{display:none!important}.app-bloq main::before{content:"Esta página não está disponível no app.";display:block;padding:64px 20px;text-align:center;font-size:18px}</style>
 </head>
 <body>
 <header class="topo">
   <a class="marca" href="./" aria-label="Lado, página inicial"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><clipPath id="pl"><rect width="50" height="100"/></clipPath><clipPath id="pr"><rect x="50" width="50" height="100"/></clipPath></defs><path clip-path="url(#pl)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#E2483D"/><path clip-path="url(#pr)" d="M50 96C50 96 16 60 16 37a34 34 0 0 1 68 0C84 60 50 96 50 96z" fill="#2F66D8"/><circle cx="50" cy="37" r="12" fill="#fff"/></svg><span>lado</span></a>
-  <nav aria-label="Menu"><a href="./como-usar/">Como usar</a><a href="./#como-funciona">Como funciona</a><a class="so-site" href="./#empresas">Para empresas</a><a href="./suporte/">Suporte</a></nav>
+  <nav aria-label="Menu"><a href="./como-usar/">Como usar</a><a href="./#como-funciona">Como funciona</a><a class="so-site" href="./empresas/">Para empresas</a><a href="./suporte/">Suporte</a></nav>
 </header>
 <main>
 
@@ -35,12 +35,14 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
     <div class="setas"><button type="button" id="telaAnt" aria-label="Tela anterior">‹</button><button type="button" id="telaProx" aria-label="Próxima tela">›</button></div>
   </div>
   <div class="trilho" id="trilho" tabindex="0" aria-label="Telas do aplicativo">
-    <figure><img src="./telas/c-1-mapa.webp" data-grande="./telas/z-1-mapa.webp" width="300" height="602" loading="lazy" decoding="async" alt="Mapa com as empresas perto de você"><figcaption><strong>Encontre empresas perto de você</strong><span>Esquerda, direita ou neutra: cada empresa escolhe como aparece.</span></figcaption></figure>
-    <figure><img class="duplo" src="./telas/c-5-filtro.webp" data-grande="./telas/z-5-filtro.webp" width="440" height="433" loading="lazy" decoding="async" alt="Filtro Todas, Neutro, Esquerda ou Direita"><figcaption><strong>Filtre pelo lado que você prefere</strong><span>Seu filtro fica só no seu celular.</span></figcaption></figure>
-    <figure><img src="./telas/c-2-lista.webp" data-grande="./telas/z-2-lista.webp" width="300" height="602" loading="lazy" decoding="async" alt="Lista das empresas próximas"><figcaption><strong>Veja quem está perto e qual é o lado</strong><span>Destaques, distância e ofertas em uma lista.</span></figcaption></figure>
-    <figure><img src="./telas/c-3-oferta.webp" data-grande="./telas/z-3-oferta.webp" width="300" height="602" loading="lazy" decoding="async" alt="Perfil da empresa com cupom de desconto"><figcaption><strong>Ofertas e cupons da sua região</strong><span>Pegue o cupom e mostre no caixa.</span></figcaption></figure>
-    <figure><img src="./telas/c-4-publicacoes.webp" data-grande="./telas/z-4-publicacoes.webp" width="300" height="602" loading="lazy" decoding="async" alt="Publicações da empresa"><figcaption><strong>Acompanhe as novidades</strong><span>Fotos e publicações feitas pela própria empresa.</span></figcaption></figure>
-    <figure><img src="./telas/c-6-empresas.webp" data-grande="./telas/z-6-empresas.webp" width="300" height="602" loading="lazy" decoding="async" alt="Área da empresa no app"><figcaption><strong>Tem uma empresa? Coloque no mapa</strong><span>Cadastro grátis, publicações e ofertas.</span></figcaption></figure>
+    <figure><img src="./telas/c-n1-mapa.webp" data-grande="./telas/z-n1-mapa.webp" width="300" height="602" loading="lazy" decoding="async" alt="Mapa com as empresas perto de você"><figcaption><strong>Encontre empresas perto de você</strong><span>Neutras, de direita ou de esquerda: cada empresa escolhe como aparece.</span></figcaption></figure>
+    <figure><img src="./telas/c-n2-neutro.webp" data-grande="./telas/z-n2-neutro.webp" width="300" height="602" loading="lazy" decoding="async" alt="Filtro Neutro ligado no mapa"><figcaption><strong>Filtre pelo lado que você prefere</strong><span>Seu filtro fica só no seu celular.</span></figcaption></figure>
+    <figure><img src="./telas/c-n3-card.webp" data-grande="./telas/z-n3-card.webp" width="300" height="602" loading="lazy" decoding="async" alt="Card da empresa no mapa com desconto"><figcaption><strong>Destaques e ofertas no mapa</strong><span>Toque no pin e veja o desconto.</span></figcaption></figure>
+    <figure><img src="./telas/c-n4-relampago.webp" data-grande="./telas/z-n4-relampago.webp" width="300" height="602" loading="lazy" decoding="async" alt="Oferta relâmpago com contagem regressiva"><figcaption><strong>Ofertas relâmpago</strong><span>Descontos de poucas horas, com contagem regressiva.</span></figcaption></figure>
+    <figure><img src="./telas/c-n5-cupom.webp" data-grande="./telas/z-n5-cupom.webp" width="300" height="602" loading="lazy" decoding="async" alt="Cupom com código para mostrar no caixa"><figcaption><strong>Pegue o cupom e mostre no caixa</strong><span>Um código só seu, que vale uma vez.</span></figcaption></figure>
+    <figure><img src="./telas/c-n6-seguir.webp" data-grande="./telas/z-n6-seguir.webp" width="300" height="602" loading="lazy" decoding="async" alt="Perfil da empresa com botão Seguir"><figcaption><strong>Siga suas lojas favoritas</strong><span>Veja as ofertas novas ao abrir o app.</span></figcaption></figure>
+    <figure><img src="./telas/c-n7-painel.webp" data-grande="./telas/z-n7-painel.webp" width="300" height="602" loading="lazy" decoding="async" alt="Painel da empresa com custo por contato e por venda"><figcaption><strong>Tem uma empresa? Veja o resultado</strong><span>Quanto custou cada contato e cada venda.</span></figcaption></figure>
+    <figure><img src="./telas/c-n8-funil.webp" data-grande="./telas/z-n8-funil.webp" width="300" height="602" loading="lazy" decoding="async" alt="Funil do mapa até a compra"><figcaption><strong>Do mapa até a compra</strong><span>O funil do mês e os cliques nas redes.</span></figcaption></figure>
   </div>
   <div class="pontos" id="pontos" aria-label="Escolher tela"></div>
   <p class="nota">Toque em uma tela para ver maior. Imagens ilustrativas, com empresas de exemplo.</p>
@@ -85,20 +87,21 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
   <h2>Como funciona</h2>
   <div class="grade">
     <div class="cartao"><h3>Empresas declaram</h3><p>Só o sócio ou titular escolhe se a empresa aparece como de esquerda, de direita ou neutra, com verificação do CNPJ e consentimento registrado.</p></div>
-    <div class="cartao"><h3>Você escolhe</h3><p>Filtre o mapa por Todas, Neutro, Esquerda ou Direita, siga as empresas que você gosta e veja ofertas, fotos e avaliações do Google.</p></div>
+    <div class="cartao"><h3>Você escolhe</h3><p>Filtre o mapa por Todas, Neutro, Direita ou Esquerda. Siga as empresas que você gosta, veja ofertas, cardápio, fotos e avaliações do Google, e pegue cupons para usar no caixa.</p></div>
     <div class="cartao"><h3>Seu anonimato</h3><p>Quem compra não precisa de conta. Seu filtro, sua busca, sua localização e as empresas que você segue não são salvos pelo Lado.</p></div>
   </div>
 </section>
 
 <section class="secao so-site" id="empresas">
   <h2>Para empresas</h2>
+  <p class="lead-emp">Anúncio local por assinatura: sua empresa aparece para quem está perto da loja, por um valor fixo por mês. Sem leilão, sem verba diária, com o custo de cada contato e de cada venda no painel.</p>
   <div class="grade">
-    <a class="cartao gratis plano-link" href="/empresa/"><h3>Grátis</h3><p>Ponto no mapa com selo Verificado, 3 fotos, 1 publicação por semana e 1 oferta.</p><span class="cta">Cadastrar grátis →</span></a>
-    <a class="cartao prata plano-link" href="/empresa/#blocoPlanos"><span class="selo-ouro selo-prata"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>Boa visibilidade</span><h3>Vitrine · R$ 39,90/mês</h3><p>Pin médio prata, 30 fotos, 3 publicações por semana, 2 ofertas, curtidas, aviso a quem segue e estatísticas completas.</p><span class="cta">Quero o Vitrine →</span></a>
-    <a class="cartao ouro plano-link" href="/empresa/#blocoPlanos"><span class="selo-ouro"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>Mais visibilidade</span><h3>Destaque · R$ 79,90/mês</h3><p>Pin grande dourado, sempre primeiro, publicações e ofertas ilimitadas, oferta relâmpago, avisos sem limite e comparação com o bairro.</p><span class="cta">Quero o Destaque →</span></a>
+    <a class="cartao gratis plano-link" href="/empresa/"><h3>Grátis</h3><p class="preco">R$ 0</p><p>Pin no mapa com selo Verificado, 3 fotos, 1 publicação por semana e 1 oferta com cupom.</p><span class="cta">Cadastrar grátis →</span></a>
+    <a class="cartao prata plano-link" href="/empresas/#planos"><span class="selo-ouro selo-prata">Boa visibilidade</span><h3>Vitrine</h3><p class="preco">R$ 39,90<small>/mês</small></p><p>Pin prata com o selo da oferta, cardápio com até 30 itens, curtidas, avisos a quem segue e estatísticas completas.</p><span class="cta">Ver tudo o que inclui →</span></a>
+    <a class="cartao ouro plano-link" href="/empresas/#planos"><span class="selo-ouro">Mais visibilidade</span><h3>Destaque</h3><p class="preco">R$ 79,90<small>/mês</small></p><p>Pin dourado, sempre primeiro, tudo ilimitado, oferta relâmpago e comparação com o bairro.</p><span class="cta">Ver tudo o que inclui →</span></a>
   </div>
-  <p style="margin-top:18px">Disponível em <strong>todo o Brasil</strong>: o mapa abre na sua região e mostra as empresas perto de você. Toda empresa nova ganha 14 dias de Destaque grátis. Você pode sair a qualquer momento, com um toque.</p>
-  <p style="margin-top:14px"><a class="botao" href="./empresa/">Área da empresa: cadastrar ou contratar um plano →</a> <a class="botao" style="background:transparent;color:var(--texto);border:1px solid var(--borda)" href="./como-usar/">Passo a passo</a></p>
+  <p style="margin-top:18px">Toda empresa nova ganha <b>14 dias de Destaque grátis</b>, sem cartão. Disponível em todo o Brasil. Você sai quando quiser, com um toque.</p>
+  <p style="margin-top:14px"><a class="botao" href="./empresas/">Planos e comparativo com Google e Meta →</a> <a class="botao" style="background:transparent;color:var(--texto);border:1px solid var(--borda)" href="./empresa/">Área da empresa</a></p>
 </section>
 
 <section class="secao">
