@@ -214,6 +214,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
           <button class="botao claro" data-plano="vitrine" data-mod="cartao" type="button">Assinar no cartão · mensal</button></div>
         <div class="plano ouro"><span class="selo-ouro"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>Mais visibilidade</span><h2 style="margin:0">Destaque ★</h2><div class="preco">R$ 79,90 <small>/mês</small></div>
           <ul><li>Pin grande dourado, sempre primeiro</li><li>Fotos, publicações e ofertas ilimitadas</li><li>Oferta relâmpago e aviso a quem segue sem limite</li><li>Comparação com a sua categoria no bairro</li><li>Tudo do Vitrine</li></ul>
+          <p class="spam" id="vagasDest" style="margin:4px 0 8px"></p>
           <button class="botao" data-plano="destaque" data-mod="pix" type="button">Pagar com Pix · 30 dias</button>
           <button class="botao claro" data-plano="destaque" data-mod="cartao" type="button">Assinar no cartão · mensal</button></div>
       </div>
@@ -376,6 +377,7 @@ async function abrirPainel() {
       `Plano atual: <strong>${NOME[e.plano]}</strong>` + (e.plano !== 'gratis' && e.plano_ate ? ` · vale até <strong>${dataBR(e.plano_ate)}</strong>` : '') +
       (emTeste ? ` · com teste grátis do Destaque até <strong>${dataBR(e.teste_destaque_ate)}</strong>` : '');
   $('blocoPlanos').classList.toggle('oculto', e.status !== 'publicada');
+  if (e.status === 'publicada') mostrarVagas(e);
   // Troca de lado (3 opções). Para Neutro não há declaração de posicionamento; para um lado, pede a autorização.
   $('trocaLado').innerHTML = ['neutro','esquerda','direita'].filter(l => l !== e.lado)
     .map(l => `<button type="button" data-troca="${l}">Mudar para ${NOME_LADO[l]}</button>`).join('');
@@ -545,7 +547,21 @@ const ERROS = {
   SENHA: 'Senha incorreta. Confira e tente de novo (ou use "Esqueci a senha" na tela de entrada).',
   CUPOM: 'Este cupom não vale mais (expirou ou já foi usado). Gere o Pix de novo pelo preço normal.',
   CARTAO: 'O cartão não foi aprovado. Confira os dados ou tente outro cartão (ou pague com Pix).',
+  SEM_VAGA: 'As 5 vagas de Destaque do seu ramo no seu bairro estão ocupadas. Nada foi cobrado. Você pode assinar o Vitrine agora; quando abrir uma vaga, o Destaque volta a ficar disponível aqui.',
 };
+/* Vagas do Destaque: no máximo 5 do mesmo ramo em cada bairro. Quem já é Destaque mantém a vaga. */
+async function mostrarVagas(e) {
+  const el = $('vagasDest'); if (!el) return; el.textContent = '';
+  try {
+    const { data } = await sb.rpc('vagas_destaque', { p_empresa: e.id });
+    const v = data && data[0]; if (!v) return;
+    const cheio = !v.ja_destaque && v.livres <= 0;
+    el.textContent = v.ja_destaque ? `Sua vaga de Destaque em ${v.bairro} fica garantida enquanto o plano estiver ativo.`
+      : cheio ? `Sem vagas agora: ${v.bairro} já tem 5 empresas Destaque do ramo ${v.ramo}.`
+      : `${v.livres === 1 ? 'Resta 1 vaga' : 'Restam ' + v.livres + ' vagas'} de Destaque para ${v.ramo} em ${v.bairro} (máximo 5 por bairro).`;
+    document.querySelectorAll('[data-plano="destaque"]').forEach(b => { b.dataset.semVaga = cheio ? '1' : ''; if (cheio) b.disabled = true; });
+  } catch {}
+}
 async function chamarPlanos(corpo) {
   const { data, error } = await sb.functions.invoke('planos', { body: corpo });
   if (error) { let c = 'ERRO'; try { c = (await error.context.json()).erro || 'ERRO'; } catch {} return { erro: ERROS[c] || 'Não foi possível concluir agora. Tente de novo em instantes ou fale com a equipe.' }; }
@@ -558,7 +574,7 @@ function fecharPag() {
   $('caixaPag').classList.add('oculto'); msg('msgPag');
   if (espera) { clearInterval(espera); espera = null; }
   if (brick) { try { brick.unmount(); } catch {} brick = null; }
-  document.querySelectorAll('[data-plano]').forEach(b => b.disabled = false);
+  document.querySelectorAll('[data-plano]').forEach(b => b.disabled = b.dataset.semVaga === '1');
 }
 $('btnFecharPag').onclick = fecharPag;
 function abrirCaixa(titulo, area) {
