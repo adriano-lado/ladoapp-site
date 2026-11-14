@@ -34,6 +34,11 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
       <a class="botao claro" href="https://apps.apple.com/br/app/lado-empresas-no-mapa/id6831672111" target="_blank" rel="noopener" id="eApple">Baixar na App Store</a>
       <p class="spam" id="eAndroid" style="margin:10px 0 0">No Android, o Lado chega em breve à Google Play.</p>
     </div>
+    <div id="eVagas" hidden style="text-align:left;margin-top:30px">
+      <h2 style="margin:0 0 4px;font-size:20px">Vagas de emprego</h2>
+      <p class="sub" style="margin:0 0 12px">Você fala direto com a empresa. O Lado não recebe nem guarda seus dados.</p>
+      <div id="eVagasLista"></div>
+    </div>
   </div>
   <div id="eNada" hidden>
     <h1>Empresa fora do mapa</h1>
@@ -58,6 +63,37 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
   var ua=navigator.userAgent, ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&'ontouchend' in document), andr=/Android/.test(ua);
   if(ios)document.getElementById('eAndroid').hidden=true;
   if(andr)document.getElementById('eApple').hidden=true;
+  // Vagas abertas (SQL 54): cargo, tipo, salário, descrição, aviso fixo e "Quero me candidatar" (WhatsApp ou e-mail da empresa)
+  try{
+    var H={apikey:'sb_publishable_3HAUdFwaNBw8sEsGrVPtkw_OdzNtd15'};
+    var rv=await fetch('https://oxhedfbrgdaxbwkjtwiz.supabase.co/rest/v1/vagas?select=cargo,tipo,salario,descricao,contato,valida_ate&order=criado_em.desc&valida_ate=gt.'+encodeURIComponent(new Date().toISOString())+'&empresa_id=eq.'+id,{headers:H});
+    var vs=rv.ok?await rv.json():[];
+    if(Array.isArray(vs)&&vs.length){
+      var TIPOS={clt:'CLT',temporario:'Temporário',estagio:'Estágio',freela:'Freela',meio_periodo:'Meio período',pj:'PJ'};
+      var conta=function(t){fetch('https://oxhedfbrgdaxbwkjtwiz.supabase.co/rest/v1/rpc/registrar_estatistica',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({p_empresa:id,p_tipo:t})}).catch(function(){});};
+      var lista=document.getElementById('eVagasLista');
+      vs.forEach(function(v){
+        var c=document.createElement('div');c.style.cssText='border:1px solid #DDE2E6;border-radius:14px;padding:14px;margin:0 0 12px';
+        var add=function(tag,txt,css){var x=document.createElement(tag);x.textContent=txt;if(css)x.style.cssText=css;c.appendChild(x);return x;};
+        add('p',(TIPOS[v.tipo]||v.tipo).toUpperCase(),'margin:0;font-size:12px;letter-spacing:1px;font-weight:700;color:#5C6770');
+        add('h3',v.cargo,'margin:4px 0;font-size:18px');
+        if(v.salario)add('p',v.salario,'margin:0 0 6px;font-weight:700;color:#0E8A5F');
+        if(v.descricao)add('p',v.descricao,'margin:0 0 6px;white-space:pre-line');
+        add('p','Aberta até '+new Date(v.valida_ate).toLocaleDateString('pt-BR'),'margin:0 0 8px;font-size:13px;color:#5C6770');
+        add('p','Vaga aberta a todas as pessoas, sem distinção de posição política, raça, gênero, religião ou idade.','margin:0 0 10px;font-size:13px;background:#F3F5F7;border:1px solid #DDE2E6;border-radius:10px;padding:10px');
+        var msg='Olá! Vi a vaga de '+v.cargo+' da '+e.nome_fantasia+' no Lado e quero me candidatar.';
+        var mail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.contato.trim()), d=v.contato.replace(/\D/g,'');
+        if(d.length===10||d.length===11)d='55'+d;
+        var a=add('a','Quero me candidatar');a.className='botao';a.style.display='block';a.style.textAlign='center';
+        a.href=mail?'mailto:'+v.contato.trim()+'?subject='+encodeURIComponent('Candidatura: '+v.cargo)+'&body='+encodeURIComponent(msg):'https://wa.me/'+d+'?text='+encodeURIComponent(msg);
+        a.target='_blank';a.rel='noopener';a.addEventListener('click',function(){conta('candidatura');});
+        lista.appendChild(c);
+      });
+      document.getElementById('eVagas').hidden=false;
+      conta('vaga');
+      if(new URLSearchParams(location.search).get('aba')==='vagas'){document.getElementById('eAbrir').href='lado://empresa/'+id+'?aba=vagas';document.getElementById('eVagas').scrollIntoView({behavior:'smooth'});}
+    }
+  }catch(x){}
 })();
 </script>
 
