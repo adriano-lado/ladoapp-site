@@ -1,0 +1,28 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "XRD3332PZU.br.com.ladoapp",
+        "appIDs": [
+          "XRD3332PZU.br.com.ladoapp"
+        ],
+        "paths": [
+          "/e",
+          "/e/",
+          "/e/*"
+        ],
+        "components": [
+          {
+            "/": "/e",
+            "comment": "Perfil da empresa"
+          },
+          {
+            "/": "/e/*",
+            "comment": "Perfil da empresa"
+          }
+        ]
+      }
+    ]
+  }
+}
