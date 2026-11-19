@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "br.com.ladoapp",
+      "sha256_cert_fingerprints": [
+        "BB:B3:8E:DB:31:71:D0:D5:70:8F:A5:FF:77:8C:52:D5:27:B4:23:9E:AD:01:A6:3D:30:05:00:7D:9D:37:4C:4B"
+      ]
+    }
+  }
+]
