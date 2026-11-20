@@ -59,8 +59,13 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
   document.getElementById('eNome').textContent=e.nome_fantasia;
   document.getElementById('eLocal').textContent=[e.categoria,e.bairro,e.cidade&&(e.cidade+(e.uf?' – '+e.uf:''))].filter(Boolean).join(' · ');
   var l=document.getElementById('eLado');l.textContent=e.lado==='esquerda'?'Esquerda':e.lado==='direita'?'Direita':'Neutro';l.style.background=e.lado==='esquerda'?'#C93A30':e.lado==='direita'?'#2556BE':'#FFFFFF';if(e.lado==='neutro'){l.style.color='#1B2228';l.style.border='1.5px solid #1B2228';}
-  document.getElementById('eAbrir').href='lado://empresa/'+id;
   var ua=navigator.userAgent, ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&'ontouchend' in document), andr=/Android/.test(ua);
+  // "Abrir no app": leva para a aba e o item do link (vaga, produto, oferta). No Android, intent:// abre o app direto (20/11).
+  var qp=new URLSearchParams(location.search), ab=qp.get('aba')||'', it=(qp.get('item')||'').toLowerCase();
+  if(['vagas','cardapio','ofertas'].indexOf(ab)<0)ab='';
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(it))it='';
+  var q='?id='+id+(ab?'&aba='+ab+(it?'&item='+it:''):'');
+  document.getElementById('eAbrir').href=andr?'intent://ladoapp.com.br/e/'+q+'#Intent;scheme=https;package=br.com.ladoapp;end':'lado://e'+q;
   if(ios)document.getElementById('eAndroid').hidden=true;
   if(andr)document.getElementById('eApple').hidden=true;
   // Vagas abertas (SQL 54): cargo, tipo, salário, descrição, aviso fixo e "Quero me candidatar" (WhatsApp ou e-mail da empresa)
@@ -91,7 +96,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
       });
       document.getElementById('eVagas').hidden=false;
       conta('vaga');
-      if(new URLSearchParams(location.search).get('aba')==='vagas'){document.getElementById('eAbrir').href='lado://empresa/'+id+'?aba=vagas';document.getElementById('eVagas').scrollIntoView({behavior:'smooth'});}
+      if(ab==='vagas'){document.getElementById('eVagas').scrollIntoView({behavior:'smooth'});}
     }
   }catch(x){}
 })();
