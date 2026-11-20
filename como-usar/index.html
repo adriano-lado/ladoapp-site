@@ -292,7 +292,8 @@ function carregar(){
   if(sec&&'IntersectionObserver' in window){var o=new IntersectionObserver(function(es){if(!visto&&es[0].isIntersecting){visto=true;fbq('track','ViewContent',{content_name:'Para empresas'});o.disconnect();}},{threshold:0.3});o.observe(sec);}
   document.addEventListener('click',function(ev){var a=ev.target.closest&&ev.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href')||'';
     if(/(^|\/)empresa\/?(#|$)/.test(h))fbq('track','Lead',{content_name:'Cadastro empresa'});
-    else if(/apps\.apple\.com|play\.google\.com/.test(h))fbq('track','Lead',{content_name:'Baixar app'});},true);
+    else if(/apps\.apple\.com|play\.google\.com/.test(h))fbq('track','Lead',{content_name:'Baixar app'});
+    else if(/wa\.me\/5527992650771/.test(h))fbq('track','Contact',{content_name:'WhatsApp suporte'});},true);
 }
 var c=ler();
 if(c==='sim'){carregar();return;}
