@@ -271,6 +271,22 @@ const dataBR = (iso) => iso ? new Date(iso).toLocaleDateString('pt-BR') : '—';
 const reais = (v) => 'R$ ' + Number(v).toFixed(2).replace('.', ',');
 const dig = (s) => String(s ?? '').replace(/\D/g, '');
 const NOME = { gratis: 'Grátis', vitrine: 'Vitrine', destaque: 'Destaque ★' };
+// Pixel da Meta na Área da empresa (20/11): SÓ se a pessoa já aceitou os cookies no site e nunca no modo app.
+// Envia só o nome do evento (e o valor do plano no pagamento). Nada de nome, CNPJ, e-mail ou lado.
+function metaEvento(evento, extra) {
+  try {
+    if (document.documentElement.classList.contains('modo-app')) return;
+    if (localStorage.getItem('ladoCookies') !== 'sim') return;
+    if (!window.fbq) {
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      fbq('set', 'autoConfig', false, '1447078484261423');
+      fbq('init', '1447078484261423');
+    }
+    fbq('track', evento, extra || {});
+  } catch (x) { /* nunca atrapalha o cadastro nem o pagamento */ }
+}
+const PRECO_META = { vitrine: 39.9, destaque: 79.9 };
+function metaPagamento(plano) { if (PRECO_META[plano]) metaEvento('Purchase', { value: PRECO_META[plano], currency: 'BRL', content_name: 'Plano ' + NOME[plano] }); }
 const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const COR = { esquerda: '#C93A30', direita: '#2556BE', neutro: '#FFFFFF' };
 const NOME_LADO = { neutro: 'Neutro', esquerda: 'Esquerda', direita: 'Direita' };
@@ -591,7 +607,7 @@ function esperarLiberacao() {
     if (Date.now() - ini > 30 * 60000) { clearInterval(espera); espera = null; return; }
     const { data } = await sb.rpc('minha_empresa'); const e = data && data[0];
     if (e && `${e.plano}|${e.plano_ate}` !== antes) {
-      fecharPag(); empresa = e; await abrirPainel();
+      fecharPag(); empresa = e; metaPagamento(e.plano); await abrirPainel();
       msg('msgPainel', 'ok', `Pagamento confirmado! Plano <strong>${NOME[e.plano]}</strong> ativo até <strong>${dataBR(e.plano_ate)}</strong>. Já vale no app (feche e abra o app). Enviamos a confirmação por e-mail.` + SPAM);
       $('msgPainel').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -669,7 +685,7 @@ async function conferirRetorno() {
     await new Promise(r => setTimeout(r, 3000));
     const { data } = await sb.rpc('minha_empresa'); const e = data && data[0];
     if (e && `${e.plano}|${e.plano_ate}` !== antes) {
-      empresa = e; await abrirPainel();
+      empresa = e; metaPagamento(e.plano); await abrirPainel();
       msg('msgPainel', 'ok', `Pagamento confirmado! Plano <strong>${NOME[e.plano]}</strong> ativo até <strong>${dataBR(e.plano_ate)}</strong>. Já vale no app (feche e abra o app). Enviamos a confirmação por e-mail.` + SPAM);
       return;
     }
@@ -691,6 +707,7 @@ async function abrirVerificacao() {
     if (o && o.verificada) {
       $('btnEnviarCodigo').classList.add('oculto');
       $('verifDestino').innerHTML = '<span class="ok">✓ Empresa verificada automaticamente!</span> O e-mail do seu login é o mesmo da Receita. Ela já está no mapa, com 14 dias de Destaque grátis. Enviamos um e-mail de boas-vindas.' + SPAM;
+      metaEvento('CompleteRegistration', { content_name: 'Cadastro empresa' });
       setTimeout(iniciar, 3500); return;
     }
     $('verifDestino').innerHTML = o && o.email ? `O código vai para <strong>${esc(o.email)}</strong>.` : 'Não encontramos e-mail da empresa na Receita. Fale com a equipe no WhatsApp para verificar.';
@@ -711,6 +728,7 @@ $('btnConfirmar').onclick = async () => {
   if (error) { msg('msgVerif', 'erro', esc(error.message)); return; }
   if (data === 'CODIGO_ERRADO') { msg('msgVerif', 'erro', 'Código incorreto. Confira os 6 números do e-mail.'); return; }
   msg('msgVerif', 'ok', 'Empresa verificada ✓ Já está no mapa, com 14 dias de Destaque grátis. Enviamos um e-mail de boas-vindas.' + SPAM);
+  metaEvento('CompleteRegistration', { content_name: 'Cadastro empresa' });
   setTimeout(iniciar, 2500);
 };
 
