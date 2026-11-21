@@ -56,6 +56,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
 <li><strong>Declaração:</strong> lado declarado e cada consentimento, com data, hora, versão dos termos e modelo do aparelho.</li>
 <li><strong>Verificação:</strong> o CPF digitado no cadastro é conferido no próprio aparelho com os dados públicos da Receita e não é enviado ao Lado. Quando a equipe verifica manualmente, guardamos só o resultado, o método e um registro protegido (hash) do CPF. Os códigos de verificação enviados por e-mail são guardados só de forma protegida (hash) e valem 15 minutos.</li>
 <li><strong>Pagamentos:</strong> plano, valor, data, forma (Pix ou cartão), situação e o código do Mercado Pago. Dados do cartão e da conta bancária ficam com o Mercado Pago; o Lado não os recebe.</li>
+<li><strong>Origem do cadastro:</strong> se a empresa chegou ao site por um anúncio ou link do Lado, guardamos o nome da campanha desse link (por exemplo "anúncio Instagram, vídeo 2"), para saber quais anúncios trazem empresas. Antes do cadastro, essa informação fica só no aparelho, por até 30 dias. Não é enviada a ninguém.</li>
 <li><strong>Contratação não concluída:</strong> quando a empresa abre o pagamento no site e não conclui, registramos o plano escolhido e a data, para enviar até dois lembretes.</li>
 <li><strong>Estatísticas:</strong> contagem mensal de aparições, aberturas do perfil, toques em rota, WhatsApp, redes sociais e cupom, aberturas de vagas e toques em "Quero me candidatar", cupons usados na loja, totais de seguidores e curtidas, e médias da mesma categoria no bairro ou na cidade (só com 5 ou mais empresas, sem mostrar números de nenhuma outra empresa).</li>
 <li><strong>Atendimento e moderação:</strong> mensagens trocadas com o suporte, denúncias sobre o perfil, contestações de cadastro e decisões da equipe, com o motivo.</li>
@@ -75,6 +76,7 @@ if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.path
 <ul>
 <li>Exibir o perfil e a declaração no mapa: consentimento específico (art. 7º, I e art. 11, I).</li>
 <li>Criar e manter a conta, verificar o cadastro, prestar o serviço e mostrar as estatísticas: execução de contrato (art. 7º, V).</li>
+<li>Saber quais anúncios e links trazem cadastros (origem do cadastro): legítimo interesse (art. 7º, IX).</li>
 <li>Prevenir fraudes, cadastros sem autorização e uso indevido: legítimo interesse e proteção do titular do CNPJ (art. 7º, IX e art. 11, II, g).</li>
 <li>Contratar, cobrar, confirmar e reembolsar planos, e enviar os e-mails da conta (boas-vindas, confirmações, reembolso e segurança): execução de contrato (art. 7º, V).</li>
 <li>Lembretes de contratação não concluída e cupons: legítimo interesse (art. 7º, IX), com link em todo e-mail para parar de receber.</li>
