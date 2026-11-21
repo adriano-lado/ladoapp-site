@@ -12,6 +12,12 @@
 (function(){var d=document.documentElement,on=/[?&]app=1(&|$)/.test(location.search);
 try{if(on)sessionStorage.setItem('ladoApp','1');on=on||sessionStorage.getItem('ladoApp')==='1';}catch(e){}
 if(on){d.classList.add('modo-app');if(/^\/(empresa|planos)\//.test(location.pathname))d.classList.add('app-bloq');}})();</script>
+<script>/* Origem do cadastro (20/11): guarda neste aparelho, por 30 dias, só o nome da campanha do link (utm_*).
+Não é cookie de terceiros, não vai para a Meta; vira um registro da empresa quando ela se cadastra. */
+(function(){try{if(/[?&]app=1(&|$)/.test(location.search))return;var q=new URLSearchParams(location.search),o={},n=0;
+['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(k){var v=q.get(k);if(v){o[k]=v.slice(0,100);n++;}});
+if(!n)return;var a=null;try{a=JSON.parse(localStorage.getItem('ladoOrigem')||'null');}catch(e){}
+if(a&&a.t&&Date.now()-a.t<30*864e5)return;o.pagina=location.pathname.slice(0,100);o.t=Date.now();localStorage.setItem('ladoOrigem',JSON.stringify(o));}catch(e){}})();</script>
 <style>.modo-app .so-site{display:none!important}.app-bloq main>*{display:none!important}.app-bloq main::before{content:"Esta página não está disponível no app.";display:block;padding:64px 20px;text-align:center;font-size:18px}</style>
 </head>
 <body>
@@ -877,6 +883,8 @@ $('btnAvancar').onclick = async () => {
     const { error: e2 } = await sb.from('consentimentos').insert({ empresa_id: emp.id, usuario_id: u.user.id, lado: cad.lado, versao_termos: 'v4-2026-11-10',
       aceitou_exibir: true, aceitou_remover: true, aceitou_termos: true, aparelho: ('Site · ' + navigator.userAgent).slice(0, 200) });
     if (e2) throw new Error('Não foi possível registrar a autorização. Tente de novo.');
+    // Origem do cadastro (20/11): campanha do link pelo qual chegou. Se falhar, não atrapalha o cadastro.
+    try { const o = JSON.parse(localStorage.getItem('ladoOrigem') || 'null'); if (o) await sb.rpc('registrar_origem', { p_empresa: emp.id, p_origem: o }); } catch (_) { /* segue */ }
     await iniciar();
   } catch (e) { msg('msgCadastro', 'erro', e.message); }
   finally { $('btnAvancar').disabled = false; }
